@@ -228,6 +228,6 @@ def agg_meteo(meteo_data='../raw_data/Meteo/historique_meteo_daily.csv',
 
     agg_dict = magg.get_agg_dict(threshold=temp_outlier_threshold)
 
-    df_agg = magg.agg_unstack(df, agg_type='S', agg_dict=agg_dict)
+    df_agg = magg.agg_unstack(df, agg_type=agg_type, agg_dict=agg_dict)
 
     return df_agg
