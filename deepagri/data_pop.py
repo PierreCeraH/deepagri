@@ -1,11 +1,14 @@
 import pandas as pd
+import os
+
+PATH=os.path.join(os.path.dirname(os.path.dirname(__file__)),'raw_data')
 
 def get_data_population(pourcentage=False,annee_start=2009,annee_fin=2021):
 
     annees=[1968,1975,1982,1990,1999,2008,2013,2018]
     df=pd.DataFrame()
     for annee in annees:
-        df_=pd.read_excel('raw_data/population_1964_2018_light.xlsx','DEP_'+str(annee))
+        df_=pd.read_excel(os.path.join(PATH,'population_1964_2018_light.xlsx'),'DEP_'+str(annee))
         df[annee]=df_['Agriculteurs\nActifs ayant un emploi\nRP'+str(annee)]
         if annee==2018:
             df.index=df_['Département']
@@ -73,7 +76,7 @@ def get_population():
     '''
 
     annees_pop=[str(i) for i in range(1975,2023)]
-    df_pop=pd.read_excel('raw_data/estim-pop-dep-sexe-gca-1975-2022.xls',sheet_name=annees_pop,header=4,index_col=0,usecols='A,H')
+    df_pop=pd.read_excel(os.path.join(PATH,'estim-pop-dep-sexe-gca-1975-2022.xls'),sheet_name=annees_pop,header=4,index_col=0,usecols='A,H')
     df_pop_full=df_pop['1975'].drop('Total',axis=1).copy()
 
     for annee in annees_pop:
