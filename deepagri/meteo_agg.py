@@ -151,14 +151,14 @@ class MeteoAggregator():
         df['period'] = 0
         df["month"] = df['date'].astype(str).str[5:7].astype(int)
         df.loc[df['month'] < 3, 'period'] = 'jan-mar'
-        df.loc[df['month'] >= 9, 'period'] = 'sept_jan'
+        df.loc[df['month'] >= 9, 'period'] = 'sept-jan_n-1'
         df = df.drop(columns='month')
         df = df[df['period']!=0]
 
         df_agg = df.groupby(['period', 'date_reg']).agg(agg_dict)
         df_agg = df_agg.unstack(level=0)
 
-        df_agg = self.downshift(df_agg, 'sept_jan')
+        df_agg = self.downshift(df_agg, 'sept-jan_n-1')
 
         return df_agg
 
