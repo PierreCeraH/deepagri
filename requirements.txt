@@ -16,3 +16,4 @@ memoized-property
 termcolor
 xlrd
 openpyxl
+os
