@@ -6,6 +6,10 @@
 
 import pandas as pd
 import numpy as np
+import os
+
+PATH=os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                               'raw_data'),'Meteo')
 
 REGION_KEY_OFFSET = 41
 
@@ -31,9 +35,9 @@ def count_outliers(series, threshold=1, greater=True):
 class MeteoAggregator():
 
     def __init__(self,
-                 meteo_data='../raw_data/Meteo/historique_meteo_daily.csv',
-                 cleaning_key='../raw_data/Meteo/scraped_meteo_name_key.xlsx',
-                 region_key='../raw_data/Meteo/Classement_Departement.xlsx'):
+                meteo_data=os.path.join(PATH,'historique_meteo_daily.csv'),
+                cleaning_key=os.path.join(PATH,'scraped_meteo_name_key.xlsx'),
+                region_key=os.path.join(PATH,'Classement_Departement.xlsx')):
         self.df = pd.read_csv(meteo_data)
         self.clean_key = pd.read_excel(cleaning_key)
         self.clean_key = self.clean_key[self.clean_key['keep']==1.0]
@@ -193,9 +197,9 @@ class MeteoAggregator():
         return df_agg
 
 
-def agg_meteo(meteo_data='../raw_data/Meteo/historique_meteo_daily.csv',
-              cleaning_key='../raw_data/Meteo/scraped_meteo_name_key.xlsx',
-              region_key='../raw_data/Meteo/Classement_Departement.xlsx',
+def agg_meteo(meteo_data=os.path.join(PATH,'historique_meteo_daily.csv'),
+              cleaning_key=os.path.join(PATH,'scraped_meteo_name_key.xlsx'),
+              region_key=os.path.join(PATH,'Classement_Departement.xlsx'),
               agg_type="M", temp_outlier_threshold=1):
     """Script-callable function
     Outputs a clean aggregated DataFrame, with a DATE-REGION index of form
