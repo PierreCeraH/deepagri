@@ -97,6 +97,7 @@ def clean_df(df, meteo_key=None):
     df = df.reset_index(drop=True)
     df['date'] = pd.to_datetime(df['date'])
     df = df.set_index("date")
+    df = df.dropna(how="all")
 
     return df
 
