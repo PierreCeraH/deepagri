@@ -17,14 +17,14 @@ def get_df_full(agg_type='S'):
     df_prices=get_prices()
     df_prod=get_production()
     df_meteo=agg_meteo(agg_type=agg_type)
-    df_rendement=get_data_rendement()
+    # df_rendement=get_data_rendement()
     df_matos=pd.read_csv(os.path.join(os.path.join(PATH,'raw_data'),'matos.csv'),index_col='0')
 
     df=df_pop.merge(df_prod,left_index=True,right_index=True)
     df=df.merge(df_prices,left_index=True,right_index=True)
     df=df.merge(df_matos,left_index=True,right_index=True)
     df=df.rename(columns={'1':"Prix_matos"})
-    df=df.merge(df_rendement,left_index=True,right_index=True)
+    # df=df.merge(df_rendement,left_index=True,right_index=True)
 
     df_meteo.columns=[' '.join(col).strip() for col in df_meteo.columns.values] #Suppression du multiindex des columns
     df_meteo.columns = df_meteo.columns.get_level_values(0)
