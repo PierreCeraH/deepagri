@@ -1,10 +1,15 @@
-# Data analysis
-- Document here the project: deepagri
-- Description: Project Description
+# DeepAgri Project
+Authors: [Pierre Cera-Huelva](https://github.com/PierreCeraH), [Wenfang Zhou](https://github.com/WenfangZh), [Constantin Talandier](https://github.com/Constantier), [Gaspar Dupas](https://github.com/Gaspar97)
+
+## Project Description
+Project in the context of a Paris LeWagon Data Science project (FT #802).
+
+The aim of the project is to predict the production of soft wheat (used for bread) in Metropolitan France. The model will be aimed at predicting production at the mid-year harvest in early July based on data available at the start of March of the same year.
+
 - Data Source:
 - Type of analysis:
 
-Please document the project the better you can.
+Please document the project the best you can.
 
 # Startup the project
 
