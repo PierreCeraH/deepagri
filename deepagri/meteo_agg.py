@@ -68,7 +68,7 @@ class MeteoAggregator():
                        left_on='id', right_on=col_region)
               .drop(columns=['id', col_region]))
 
-        df['date_reg'] = df['date'].astype(str).str[:5] + df['code_dep'].astype(str)
+        df['date_dep'] = df['date'].astype(str).str[:5] + df['code_dep'].astype(str)
 
         return df
 
@@ -110,10 +110,10 @@ class MeteoAggregator():
         if agg_dict==None:
             agg_dict = self.get_agg_dict()
 
-        df['date_reg'] = df['date'].astype(str).str[:5] + df['code_dep'].astype(str)
+        df['date_dep'] = df['date'].astype(str).str[:5] + df['code_dep'].astype(str)
         df['month'] = df['date'].astype(str).str[5:7]
 
-        df_agg = df.groupby(['date_reg', 'month']).agg(agg_dict)
+        df_agg = df.groupby(['date_dep', 'month']).agg(agg_dict)
 
         df_agg = df_agg.unstack(level=1)
 
@@ -129,10 +129,15 @@ class MeteoAggregator():
             agg_dict = self.get_agg_dict()
 
         df['date'] = pd.to_datetime(df['date'])
+        df['year_of_week_start'] = df['date'].apply(lambda x:
+            str(pd.Timestamp.isocalendar(x)[0]))
         df['week_of_year'] = df['date'].apply(lambda x:
             int(pd.Timestamp.isocalendar(x)[1]))
 
-        df_agg = df.groupby(['date_reg', 'week_of_year']).agg(agg_dict)
+        df.drop(columns=['date_dep', 'date'])
+        df['date_dep'] = df['year_of_week_start'] + "-" + df['code_dep']
+
+        df_agg = df.groupby(['date_dep', 'week_of_year']).agg(agg_dict)
         df_agg = df_agg.unstack(level=1)
 
         return df_agg
@@ -155,7 +160,7 @@ class MeteoAggregator():
         df = df.drop(columns='month')
         df = df[df['period']!=0]
 
-        df_agg = df.groupby(['period', 'date_reg']).agg(agg_dict)
+        df_agg = df.groupby(['period', 'date_dep']).agg(agg_dict)
         df_agg = df_agg.unstack(level=0)
 
         df_agg = self.downshift(df_agg, 'sept-jan_n-1')

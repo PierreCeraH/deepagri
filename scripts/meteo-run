@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from meteo_agg import agg_meteo()
+from deepagri.meteo_agg import agg_meteo
 
 agg_meteo()
