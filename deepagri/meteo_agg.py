@@ -140,13 +140,32 @@ class MeteoAggregator():
         df['year_of_week_start'] = df['date'].apply(lambda x:
             str(pd.Timestamp.isocalendar(x)[0]))
         df['week_of_year'] = df['date'].apply(lambda x:
-            int(pd.Timestamp.isocalendar(x)[1]))
+            str(pd.Timestamp.isocalendar(x)[1]).zfill(2))
 
         df.drop(columns=['date_dep', 'date'])
         df['date_dep'] = df['year_of_week_start'] + "-" + df['code_dep']
 
+        # Drop 9th week because it's usually halfway on feb-march
+        # which causes issues, and it's far back enough in n-1 that it's
+        # mostly irrelevant
+        df = df[df['week_of_year']!='09']
+        df.loc[~df['week_of_year'].isin(
+            ['01', '02', '03', '04', '05', '06', '07', '08']),
+               'week_of_year'] = (df.loc[~df['week_of_year'].isin(
+                   ['01', '02', '03', '04', '05', '06', '07', '08']),
+                                         'week_of_year'] + "_n-1")
+
         df_agg = df.groupby(['date_dep', 'week_of_year']).agg(agg_dict)
         df_agg = df_agg.unstack(level=1)
+
+        df_agg = self.downshift(df_agg, ['10_n-1', '11_n-1',
+            '12_n-1', '13_n-1', '14_n-1', '15_n-1', '16_n-1', '17_n-1',
+            '18_n-1', '19_n-1', '20_n-1', '21_n-1', '22_n-1', '23_n-1',
+            '24_n-1', '25_n-1', '26_n-1', '27_n-1', '28_n-1', '29_n-1',
+            '30_n-1', '31_n-1', '32_n-1', '33_n-1', '34_n-1', '35_n-1',
+            '36_n-1', '37_n-1', '38_n-1', '39_n-1', '40_n-1', '41_n-1',
+            '42_n-1', '43_n-1', '44_n-1', '45_n-1', '46_n-1', '47_n-1',
+            '48_n-1', '49_n-1', '50_n-1', '51_n-1', '52_n-1', '53_n-1'])
 
         return df_agg
 
