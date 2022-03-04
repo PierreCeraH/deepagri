@@ -177,14 +177,13 @@ class MeteoAggregator():
         """
         if agg_dict==None:
             agg_dict = self.get_agg_dict()
-        agg_dict['date'] = 'first'
 
         df = df.reset_index()
         df['period'] = 0
         df["month"] = df['date'].astype(str).str[5:7].astype(int)
         df.loc[df['month'] < 3, 'period'] = 'jan-mar'
         df.loc[df['month'] >= 9, 'period'] = 'sept-jan_n-1'
-        df = df.drop(columns='month')
+        df = df.drop(columns=['month', 'index', 'date'])
         df = df[df['period']!=0]
 
         df_agg = df.groupby(['period', 'date_dep']).agg(agg_dict)
