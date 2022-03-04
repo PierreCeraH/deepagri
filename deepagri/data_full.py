@@ -22,7 +22,7 @@ def get_df_full(agg_type='S'):
     df=df.merge(df_matos,left_index=True,right_index=True)
     df=df.rename(columns={'1':"Prix_matos"})
 
-    df_meteo.columns=[' '.join(str(col)).strip() for col in df_meteo.columns.values] #Suppression du multiindex des columns
+    df_meteo.columns=[' '.join(col).strip() for col in df_meteo.columns.values] #Suppression du multiindex des columns
     df_meteo.columns = df_meteo.columns.get_level_values(0)
 
     df_meteo=df_meteo.loc[:'2021-95',:].dropna()
@@ -36,4 +36,4 @@ def get_df_full(agg_type='S'):
 
 
 if __name__=='__main__':
-    print(get_df_full('M'))
+    print(get_df_full('W'))
