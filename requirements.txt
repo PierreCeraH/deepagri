@@ -10,11 +10,10 @@ pandas
 scikit-learn
 
 # utilities
-six>=1.14
 joblib
 memoized-property
 termcolor
 xlrd
 openpyxl==3.0.3
-os
+# os
 streamlit
