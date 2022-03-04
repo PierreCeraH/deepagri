@@ -113,9 +113,17 @@ class MeteoAggregator():
         df['date_dep'] = df['date'].astype(str).str[:5] + df['code_dep'].astype(str)
         df['month'] = df['date'].astype(str).str[5:7]
 
-        df_agg = df.groupby(['date_dep', 'month']).agg(agg_dict)
+        # Editing month names to reflect months >= 3 being from n-1
+        df.loc[~df['month'].isin(['01','02']), 'month'] = (
+            df.loc[~df['month'].isin(['01','02']), 'month']
+            + "_n-1")
 
+        df_agg = df.groupby(['date_dep', 'month']).agg(agg_dict)
         df_agg = df_agg.unstack(level=1)
+
+        df_agg = self.downshift(df_agg, ['03_n-1', '04_n-1', '05_n-1',
+                                         '06_n-1', '07_n-1', '08_n-1',
+                                         '09_n-1', '10_n-1', '11_n-1', '12_n-1'])
 
         return df_agg
 
