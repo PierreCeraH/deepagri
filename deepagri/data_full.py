@@ -3,7 +3,7 @@ from deepagri.data_pop import get_data_population
 from deepagri.data_price import get_prices
 from deepagri.data_prod import get_production
 from deepagri.meteo_agg import agg_meteo
-from deepagri.data_rendement import get_data_rendement
+# from deepagri.data_rendement import get_data_rendement
 import os
 
 PATH=os.path.dirname(os.path.dirname(__file__))
