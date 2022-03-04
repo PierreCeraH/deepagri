@@ -49,7 +49,7 @@ class MeteoAggregator():
             self.region_key[['Departement','id_hist_meteo']].astype(int))
 
 
-    def clean_names(self, df=pd.DataFrame(), col_clean='name_clean'):
+    def get_clean_names(self, df=pd.DataFrame(), col_clean='name_clean'):
         if df.empty:
             df = self.df
         df = df[self.clean_key[col_clean]]
@@ -113,9 +113,16 @@ class MeteoAggregator():
         df['date_dep'] = df['date'].astype(str).str[:5] + df['code_dep'].astype(str)
         df['month'] = df['date'].astype(str).str[5:7]
 
-        df_agg = df.groupby(['date_dep', 'month']).agg(agg_dict)
+        # Editing month names to reflect months >= 3 being from n-1
+        df.loc[~df['month'].isin(['01','02','03','04','05']), 'month'] = (
+            df.loc[~df['month'].isin(['01','02','03','04','05']), 'month']
+            + "_n-1")
 
+        df_agg = df.groupby(['date_dep', 'month']).agg(agg_dict)
         df_agg = df_agg.unstack(level=1)
+
+        df_agg = self.downshift(df_agg, ['06_n-1', '07_n-1', '08_n-1',
+                                         '09_n-1', '10_n-1', '11_n-1', '12_n-1'])
 
         return df_agg
 
@@ -132,13 +139,35 @@ class MeteoAggregator():
         df['year_of_week_start'] = df['date'].apply(lambda x:
             str(pd.Timestamp.isocalendar(x)[0]))
         df['week_of_year'] = df['date'].apply(lambda x:
-            int(pd.Timestamp.isocalendar(x)[1]))
+            str(pd.Timestamp.isocalendar(x)[1]).zfill(2))
 
         df.drop(columns=['date_dep', 'date'])
         df['date_dep'] = df['year_of_week_start'] + "-" + df['code_dep']
 
+        # Drop 22nd week because it's usually halfway on may-june
+        # which causes issues, and it's far back enough in n-1 that it's
+        # mostly irrelevant
+        # Also drop week 35 for same reasons except on Aug-Sept
+        df = df[df['week_of_year']!='22']
+        df = df[df['week_of_year']!='35']
+        df = df[df['week_of_year']!='53'] # Rare occurence so dropped
+        df.loc[~df['week_of_year'].isin(
+            ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
+             '11','12','13','14','15','16','17','18','19','20','21']),
+               'week_of_year'] = (df.loc[~df['week_of_year'].isin(
+                   ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
+                    '11','12','13','14','15','16','17','18','19','20','21']),
+                                         'week_of_year'] + "_n-1")
+
         df_agg = df.groupby(['date_dep', 'week_of_year']).agg(agg_dict)
         df_agg = df_agg.unstack(level=1)
+
+        df_agg = self.downshift(df_agg, ['23_n-1',
+            '24_n-1', '25_n-1', '26_n-1', '27_n-1', '28_n-1', '29_n-1',
+            '30_n-1', '31_n-1', '32_n-1', '33_n-1', '34_n-1', '35_n-1',
+            '36_n-1', '37_n-1', '38_n-1', '39_n-1', '40_n-1', '41_n-1',
+            '42_n-1', '43_n-1', '44_n-1', '45_n-1', '46_n-1', '47_n-1',
+            '48_n-1', '49_n-1', '50_n-1', '51_n-1', '52_n-1'])
 
         return df_agg
 
@@ -150,20 +179,19 @@ class MeteoAggregator():
         """
         if agg_dict==None:
             agg_dict = self.get_agg_dict()
-        agg_dict['date'] = 'first'
 
         df = df.reset_index()
         df['period'] = 0
         df["month"] = df['date'].astype(str).str[5:7].astype(int)
-        df.loc[df['month'] < 3, 'period'] = 'jan-mar'
-        df.loc[df['month'] >= 9, 'period'] = 'sept-jan_n-1'
-        df = df.drop(columns='month')
+        df.loc[df['month'] < 6, 'period'] = 'jan-may'
+        df.loc[df['month'] >= 9, 'period'] = 'sept-dec_n-1'
+        df = df.drop(columns=['month', 'index', 'date'])
         df = df[df['period']!=0]
 
         df_agg = df.groupby(['period', 'date_dep']).agg(agg_dict)
         df_agg = df_agg.unstack(level=0)
 
-        df_agg = self.downshift(df_agg, 'sept-jan_n-1')
+        df_agg = self.downshift(df_agg, 'sept-dec_n-1')
 
         return df_agg
 
@@ -190,14 +218,22 @@ class MeteoAggregator():
             -"S": aggregates into 2 periods, Jan-March and Sept-Jan
         agg_dict: dictionary, dict containing the agg functions
         """
+        if (agg_type=="S"):
+            df_agg = self.agg_sp(df, agg_dict=agg_dict)
+            return df_agg
+
+        df['period'] = 0
+        df["month"] = df['date'].astype(str).str[5:7].astype(int)
+        df.loc[df['month'] < 6, 'period'] = 'jan-mar'
+        df.loc[df['month'] >= 9, 'period'] = 'sept-jan_n-1'
+        df = df[df['period']!=0]
+        df = df.drop(columns=['month', 'period'])
+
         if (agg_type=="M"):
             df_agg = self.agg_month(df, agg_dict=agg_dict)
 
         if (agg_type=="W"):
             df_agg = self.agg_week(df, agg_dict=agg_dict)
-
-        if (agg_type=="S"):
-            df_agg = self.agg_sp(df, agg_dict=agg_dict)
 
         return df_agg
 
@@ -232,7 +268,7 @@ def agg_meteo(meteo_data=os.path.join(PATH,'historique_meteo_daily.csv'),
     """
     magg = MeteoAggregator(meteo_data, cleaning_key, region_key)
 
-    df = magg.clean_names()
+    df = magg.get_clean_names()
     df = magg.add_dept(df)
 
     agg_dict = magg.get_agg_dict(threshold=temp_outlier_threshold)
