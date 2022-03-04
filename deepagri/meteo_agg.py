@@ -147,7 +147,9 @@ class MeteoAggregator():
         # Drop 22nd week because it's usually halfway on may-june
         # which causes issues, and it's far back enough in n-1 that it's
         # mostly irrelevant
+        # Also drop week 35 for same reasons except on Aug-Sept
         df = df[df['week_of_year']!='22']
+        df = df[df['week_of_year']!='35']
         df = df[df['week_of_year']!='53'] # Rare occurence so dropped
         df.loc[~df['week_of_year'].isin(
             ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
