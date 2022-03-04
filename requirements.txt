@@ -15,5 +15,6 @@ joblib
 memoized-property
 termcolor
 xlrd
-openpyxl
+openpyxl==3.0.3
 os
+streamlit
