@@ -1,54 +1,50 @@
 import streamlit as st
 import datetime
 import requests
+from streamlit_folium import folium_static
+import folium
+import os
+import pandas as pd
 
-'''
-# DeepAgri - Forecasting French wheat production for 2022 !
-'''
+st.title('DEEPAGRI - Forecasting French Soft Wheat Production in 2022')
 
 
-st.title('Forecasting French Soft Wheat Production - Deep Learning Model')
+m = folium.Map(location=[47, 1], zoom_start=6)
 
-passenger_count = st.slider('Select a modulus', 1, 10, 2)
+geojson_path = os.path.join("data", "departements.json")
+cities_path = os.path.join("data", "lewagon_cities.csv")
 
-traject_date = st.date_input(
-    "Date of your traject",
-    datetime.date(2022, 1, 1))
-st.write('Date of the traject', traject_date)
+for _, city in pd.read_csv(cities_path).iterrows():
+    folium.Marker(
+        location=[city.lat, city.lon],
+        popup=city.city,
+        icon=folium.Icon(color="red", icon="info-sign"),
+    ).add_to(m)
 
-traject_time = st.time_input('Set the traject time', datetime.time(8, 45))
-st.write('Time of the traject', traject_time)
+def color_function(feat):
+    return "red" if int(feat["properties"]["code"][:1]) < 5 else "blue"
 
-pickup_datetime = datetime.datetime.combine(traject_date, traject_time)
+folium.GeoJson(
+    geojson_path,
+    name="geojson",
+    style_function=lambda feat: {
+        "weight": 1,
+        "color": "black",
+        "opacity": 0.25,
+        "fillColor": color_function(feat),
+        "fillOpacity": 0.25,
+    },
+    highlight_function=lambda feat: {
+        "fillColor": color_function(feat),
+        "fillOpacity": .5,
+    },
+    tooltip=folium.GeoJsonTooltip(
+        fields=['code', 'nom'],
+        aliases=['Code', 'Name'],
+        localize=True
+    ),
+).add_to(m)
 
-columns = st.columns(2)
-
-#DEPARTURE COORDINATES
-#st.markdown('Coordinates of your DEPARTURE point :')
-pickup_latitude = columns[0].number_input('Insert the Departure LATITUDE')
-#st.write('Departure LATITUDE : ', pickup_latitude)
-pickup_longitude = columns[1].number_input('Insert the Departure LONGITUDE')
-#st.write('Departure LONGITUDE : ', pickup_longitude)
-
-#ARRIVAL COORDINATES
-#st.markdown('Coordinates of your ARRIVAL point :')
-dropoff_latitude = columns[0].number_input('Insert the Arrival LATITUDE')
-#st.write('Arrival LATITUDE : ', dropoff_latitude)
-dropoff_longitude = columns[1].number_input('Insert the Arrival LONGITUDE')
-#st.write('Arrival LONGITUDE : ', dropoff_longitude)
+folium_static(m)
 
 bt = st.button('Calculate fare')
-
-params = {
-    'pickup_datetime' : pickup_datetime,
-    'pickup_longitude' : pickup_longitude,
-    'pickup_latitude' : pickup_latitude,
-    'dropoff_longitude' : dropoff_longitude,
-    'dropoff_latitude' : dropoff_latitude,
-    'passenger_count' : passenger_count
-}
-url = 'https://taxifare.lewagon.ai/predict'
-
-if bt:
-    response = requests.get(url, params).json()
-    st.write(response['fare'])
