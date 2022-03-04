@@ -149,6 +149,7 @@ class MeteoAggregator():
         # which causes issues, and it's far back enough in n-1 that it's
         # mostly irrelevant
         df = df[df['week_of_year']!='09']
+        df = df[df['week_of_year']!='53']
         df.loc[~df['week_of_year'].isin(
             ['01', '02', '03', '04', '05', '06', '07', '08']),
                'week_of_year'] = (df.loc[~df['week_of_year'].isin(
@@ -165,7 +166,7 @@ class MeteoAggregator():
             '30_n-1', '31_n-1', '32_n-1', '33_n-1', '34_n-1', '35_n-1',
             '36_n-1', '37_n-1', '38_n-1', '39_n-1', '40_n-1', '41_n-1',
             '42_n-1', '43_n-1', '44_n-1', '45_n-1', '46_n-1', '47_n-1',
-            '48_n-1', '49_n-1', '50_n-1', '51_n-1', '52_n-1', '53_n-1'])
+            '48_n-1', '49_n-1', '50_n-1', '51_n-1', '52_n-1'])
 
         return df_agg
 
