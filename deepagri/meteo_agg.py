@@ -240,3 +240,6 @@ def agg_meteo(meteo_data=os.path.join(PATH,'historique_meteo_daily.csv'),
     df_agg = magg.agg_unstack(df, agg_type=agg_type, agg_dict=agg_dict)
 
     return df_agg
+
+if __name__=='__main__':
+    print(agg_meteo(agg_type='S'))
