@@ -59,13 +59,6 @@ pypi:
 
 
 # ----------------------------------
-#         LOCAL SET UP
-# ----------------------------------
-
-install_requirements:
-	@pip install -r requirements.txt
-
-# ----------------------------------
 #         HEROKU COMMANDS
 # ----------------------------------
 
@@ -84,3 +77,6 @@ heroku_create_app:
 deploy_heroku:
 	-@git push heroku master
 	-@heroku ps:scale web=1
+
+run_streamlit:
+	-@streamlit run app.py
