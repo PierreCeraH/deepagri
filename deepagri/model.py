@@ -25,10 +25,9 @@ def build_model(model=None):
 
     scaler=RobustScaler()
     pipe=Pipeline([
-            ('Scaler',scaler),
-            ('Model',model)
-    ])
-
+                ('Scaler',scaler),
+                ('Model',model)
+                ])
     return pipe
 
 def fit_model(pipe,X,y):
