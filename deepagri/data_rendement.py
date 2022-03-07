@@ -46,7 +46,7 @@ def get_data_rendement():
 
     df_surfaces = pd.DataFrame(df.stack())
 
-    df_surfaces = df_surfaces.rename(columns={0:'_n-1'})
+    df_surfaces = df_surfaces.rename(columns={0:'Prod_n-1'})
     df_surfaces = df_surfaces.reset_index()
     df_surfaces['Ind']=df_surfaces['ANNEE'].astype(int).astype(str)+'-'+df_surfaces['level_1'].astype(str)
 
