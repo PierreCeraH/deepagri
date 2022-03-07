@@ -71,8 +71,8 @@ class MeteoAggregator():
                        axis=1)
         df = df[self.clean_key[col_clean]]
 
-        df['tmax_deg'] = df['tmax_ct']
-        df['tmin_deg'] = df['tmin_ct']
+        df['tmax_deg'] = df['tmax_c']
+        df['tmin_deg'] = df['tmin_c']
 
         return df
 
@@ -107,10 +107,10 @@ class MeteoAggregator():
                      index=self.clean_key['name_clean']).to_dict()
         del agg_dict['date']
         del agg_dict['id']
-        agg_dict['tmax_ct'] = (lambda x :
+        agg_dict['tmax_c'] = (lambda x :
             count_outliers(x, threshold=threshold, greater=True,
                            relative_thresh=relative_thresh))
-        agg_dict['tmin_ct'] = (lambda x :
+        agg_dict['tmin_c'] = (lambda x :
             count_outliers(x, threshold=threshold, greater=False,
                            relative_thresh=relative_thresh))
         agg_dict['tmax_deg'] = "max"
