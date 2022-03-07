@@ -4,6 +4,7 @@ from deepagri.data_full import get_df_full
 from sklearn.preprocessing import RobustScaler
 from sklearn.pipeline import Pipeline
 from xgboost import XGBRegressor
+from sklearn.linear_model import LinearRegression
 # from sklearn.model_selection import cross_validate
 from sklearn.metrics import mean_absolute_error
 from sklearn.inspection import permutation_importance
@@ -22,6 +23,8 @@ def build_model(model=None):
 
     if model==None:
         model=XGBRegressor(max_depth=10, n_estimators=100, learning_rate=0.1)
+    elif model=='linear_reg':
+        model=LinearRegression()
 
     scaler=RobustScaler()
     pipe=Pipeline([
@@ -72,7 +75,7 @@ def permutation_score(pipe,X,y):
     permutation_score = permutation_importance(pipe, X, y, n_repeats=10)
     importance_df = pd.DataFrame(np.vstack((X.columns,permutation_score.importances_mean)).T) # Unstack results from permutation_score
     importance_df.columns=['feature','score decrease']
-    return importance_df.sort_values(by="score decrease", ascending = False)
+    return importance_df.sort_values(by="score decrease", perascending = False)
 
 def full_model(cross_val=False):
     '''
