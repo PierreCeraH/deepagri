@@ -1,14 +1,15 @@
 from deepagri.meteo_agg import agg_meteo
 from deepagri.data_pop import get_data_population
 from deepagri.data_price import get_prices_2022
+from deepagri.data_rendement import get_data_rendement
 
 import pandas as pd
 
-def get_X_pred():
+def get_X_pred(agg_type="W"):
 
     """ This function returns the X for the prediction of 2022 production"""
 
-    df_meteo = agg_meteo(agg_type="W")
+    df_meteo = agg_meteo(agg_type=agg_type)
 
     # 2022 meteo
 
@@ -32,13 +33,28 @@ def get_X_pred():
 
     df_2021 = df_meteo[list_]
 
-    list_weeks = ['01','02','03','04','05','06','07','08','10_n-1','11_n-1','12_n-1','13_n-1','14_n-1','15_n-1','16_n-1','17_n-1','18_n-1','19_n-1','20_n-1','21_n-1','22_n-1']
-    list_weeks_2022 = ['01','02','03','04','05','06','07','08']
-    list_weeks_2021 = ['10_n-1','11_n-1','12_n-1','13_n-1','14_n-1','15_n-1','16_n-1','17_n-1','18_n-1','19_n-1','20_n-1','21_n-1','22_n-1']
+    colum = df_2021['tmax_c'].columns
+
+    list_weeks = colum
+    list_weeks_2021 = list(list_weeks[9:21])
+    list_weeks_2021_2022 = list(list_weeks[21:53])
+
+    list_weeks_2022 = list(list_weeks[0:9])
+
+    list_compl_weeks = list_weeks_2021_2022
+
+    for i in list_weeks[0:21] :
+        list_compl_weeks.append(i)
+
+    for i in list_weeks[21:53] :
+        list_weeks_2021.append(i)
+
+    list_weeks_2021_fin =  list_weeks_2021[12:]
+    list_weeks_2021_fin.extend(list_weeks_2021[0:12])
 
     list_tuples = []
     for i in list_col :
-        for j in list_weeks :
+        for j in list_compl_weeks :
             list_tuples.append((i,j))
 
     index = pd.MultiIndex.from_tuples(list_tuples, names=["", "week_of_year"])
@@ -50,7 +66,7 @@ def get_X_pred():
         for j in list_weeks_2022 :
             col = df_2022[i,j]
             df_final_predict[i,j] = col
-        for j in list_weeks_2021 :
+        for j in list_weeks_2021_fin :
             col = df_2021[i,j]
             df_final_predict[i,j] = list(col)
 
@@ -74,5 +90,10 @@ def get_X_pred():
     df_matos = pd.DataFrame(91.6,index=df_2022.index, columns=['Prix_matos'])
 
     df_final_predict = df_final_predict.merge(df_matos,right_index=True, left_index=True)
+
+    # Yield 2022
+
+    data_rend = get_data_rendement()
+    df_final_predict = df_final_predict.merge(data_rend,right_index=True, left_index=True)
 
     return df_final_predict
