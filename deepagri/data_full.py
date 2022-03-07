@@ -4,6 +4,7 @@ from deepagri.data_price import get_prices
 from deepagri.data_prod import get_production
 from deepagri.meteo_agg import agg_meteo
 from deepagri.data_rendement import get_data_rendement
+from deepagri.data_region_ohe import ohe_regions
 import os
 
 PATH=os.path.dirname(os.path.dirname(__file__))
@@ -32,6 +33,8 @@ def get_df_full(agg_type='S'):
     df_meteo=df_meteo.loc[:'2021-95',:].dropna()
 
     df=df.merge(df_meteo,left_index=True,right_index=True)
+
+    df=ohe_regions(df)
 
     return df
 
