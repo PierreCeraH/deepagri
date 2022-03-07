@@ -12,7 +12,7 @@ st.title('DEEPAGRI - Forecasting French Soft Wheat Production in 2022')
 geojson_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/deepagri/data/departements.json?token=GHSAT0AAAAAABRZSTYPRBKUPX6I2JWETXZEYRGDUUQ'
 
 # Dataframe Preprocessing
-filepath = '/Users/pierre/code/PierreCeraH/deepagri/raw_data/cleaned/Production_Y.xlsx'
+filepath = os.path.join('Users','pierre','code','PierreCeraH','deepagri','raw_data','cleaned','Production_Y.xlsx')
 df = pd.read_excel(filepath)
 
 df = df.drop('Prod.(t)',axis=1)
