@@ -13,23 +13,32 @@ PATH=os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)),
 
 REGION_KEY_OFFSET = 41
 
-def count_outliers(series, threshold=1, greater=True):
+def count_outliers(series, threshold=1, greater=True, relative_thresh=True):
     """
     Aggregator function to count occurences greater / smaller than n standard
     deviations.
-    ------------
-    Params:
-    threshold: Number of standard deviations to set as a threshold. Default 1
-    greater: Boolean. If true, will count occurences greater than the given
-            threshold. If false, will count occurences smaller than the given
-            threshold.
+    ----------
+    Parameters:
+    threshold: Float, default 1.
+            Number of standard deviations to set as a threshold.
+    greater: Boolean, default True.
+            If True, will count occurences greater than the given threshold.
+            If False, will count occurences smaller than the given threshold.
+    relative_thresh: Boolean, default True.
+            If True, will take the threshold as a number of standard deviations,
+            and count the number of days above / below (mean + threshold * s.d)
+            If False, will take the threshold as the absolute value of a
+            temperature to beat, in °C
     """
-    if greater:
-        return (series >= (series.mean() + threshold * series.std())).sum()
-    elif not greater:
-        return (series <= (series.mean() - threshold * series.std())).sum()
+    if relative_thresh: # threshold as a standard dev
+        limit = series.mean() + threshold * series.std()
     else:
-        raise TypeError("Argument 'greater' should be a boolean")
+        limit = threshold
+
+    if greater:
+        return (series >= limit).sum()
+    elif not greater:
+        return (series <= limit).sum()
 
 
 class MeteoAggregator():
@@ -49,10 +58,22 @@ class MeteoAggregator():
             self.region_key[['Departement','id_hist_meteo']].astype(int))
 
 
-    def get_clean_names(self, df=pd.DataFrame(), col_clean='name_clean'):
+    def get_clean_data(self, df=pd.DataFrame(), col_clean='name_clean',
+                       col_raw='name_raw'):
+        """
+        Gets the data, cleans column names and adds the tmax_deg and tmin_deg
+        columns
+        """
         if df.empty:
             df = self.df
+        df = df.rename(pd.Series(self.clean_key[col_clean].values,
+                                 index=self.clean_key[col_raw]).to_dict(),
+                       axis=1)
         df = df[self.clean_key[col_clean]]
+
+        df['tmax_deg'] = df['tmax_ct']
+        df['tmin_deg'] = df['tmin_ct']
+
         return df
 
     def add_dept(self, df=pd.DataFrame(), col_region='id_hist_meteo'):
@@ -72,8 +93,11 @@ class MeteoAggregator():
 
         return df
 
-    def get_agg_dict(self, threshold=1, higher_thresh=None, lower_thresh=None):
-        """Returns an aggregation dictionary"""
+    def get_agg_dict(self, threshold=1, higher_thresh=None, lower_thresh=None,
+                     relative_thresh=True):
+        """Returns an aggregation dictionary to be used by agg_unstack()
+        See count_outliers() for parameters
+        """
         if higher_thresh==None:
             higher_thresh=threshold
         if lower_thresh==None:
@@ -83,10 +107,14 @@ class MeteoAggregator():
                      index=self.clean_key['name_clean']).to_dict()
         del agg_dict['date']
         del agg_dict['id']
-        agg_dict['tmax_c'] = (lambda x :
-            count_outliers(x, threshold=threshold, greater=True))
-        agg_dict['tmin_c'] = (lambda x :
-            count_outliers(x, threshold=threshold, greater=False))
+        agg_dict['tmax_ct'] = (lambda x :
+            count_outliers(x, threshold=threshold, greater=True,
+                           relative_thresh=relative_thresh))
+        agg_dict['tmin_ct'] = (lambda x :
+            count_outliers(x, threshold=threshold, greater=False,
+                           relative_thresh=relative_thresh))
+        agg_dict['tmax_deg'] = "max"
+        agg_dict['tmin_deg'] = "min"
 
         return agg_dict
 
@@ -241,7 +269,7 @@ class MeteoAggregator():
 def agg_meteo(meteo_data=os.path.join(PATH,'historique_meteo_daily.csv'),
               cleaning_key=os.path.join(PATH,'scraped_meteo_name_key.xlsx'),
               region_key=os.path.join(PATH,'Classement_Departement.xlsx'),
-              agg_type="M", temp_outlier_threshold=1):
+              agg_type='M',**kwargs):
     """Script-callable function
     Outputs a clean aggregated DataFrame, with a DATE-REGION index of form
     "YYYY-XX"
@@ -261,17 +289,14 @@ def agg_meteo(meteo_data=os.path.join(PATH,'historique_meteo_daily.csv'),
         - "M": monthly aggregation
         - "S": special aggregation - split into jan-march and sept-jan periods
 
-    temp_outlier_threshold: aggregation key for the max and min temperature
-        columns, which count the number of days past the threshold. Defined in
-        standard deviations, i.e. a temp_outlier_threshold=1 means we will count
-        all days where we are more than one standard deviation outside the mean.
+    **kwargs: count_outliers() arguments
     """
     magg = MeteoAggregator(meteo_data, cleaning_key, region_key)
 
-    df = magg.get_clean_names()
+    df = magg.get_clean_data()
     df = magg.add_dept(df)
 
-    agg_dict = magg.get_agg_dict(threshold=temp_outlier_threshold)
+    agg_dict = magg.get_agg_dict(**kwargs)
 
     df_agg = magg.agg_unstack(df, agg_type=agg_type, agg_dict=agg_dict)
 
