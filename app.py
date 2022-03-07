@@ -5,46 +5,83 @@ from streamlit_folium import folium_static
 import folium
 import os
 import pandas as pd
-
+import json
 
 st.title('DEEPAGRI - Forecasting French Soft Wheat Production in 2022')
 
-m = folium.Map(location=[47, 1], zoom_start=5)
-
 geojson_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/deepagri/data/departements.json?token=GHSAT0AAAAAABRZSTYPRBKUPX6I2JWETXZEYRGDUUQ'
 
-#cities_path = '/Users/pierre/code/PierreCeraH/deepagri/raw_data/lewagon_cities.csv'
+# Dataframe Preprocessing
+filepath = '/Users/pierre/code/PierreCeraH/deepagri/raw_data/cleaned/Production_Y.xlsx'
+df = pd.read_excel(filepath)
 
-#for _, city in pd.read_csv(cities_path).iterrows():
+df = df.drop('Prod.(t)',axis=1)
+df.set_index('Année',inplace=True)
+df = df.T
+df = df.reset_index()
 
-#    folium.Marker(
-#        location=[city.lat, city.lon],
-#        popup=city.city,
-#        icon=folium.Icon(color="red", icon="info-sign"),
-#    ).add_to(m)
+df.fillna(0,inplace=True)
+
+for i in range(2001,2022):
+    df[f'Var {i}-{i-1}']=round((df[i]-df[i-1])/df[i-1]*100,2)
+
+df = df.drop([i for i in range(2000,2022)], axis=1)
+
+#Only one year for testing
+df_test = df[['index','Var 2021-2020']]
+
+
+#Getting GEOJSON file
+#nom_dept = []
+
+#with open(geojson_path) as dept_file :
+#    dept_json = json.load(dept_file)
+
+#for index in range(len(dept_json['features'])):
+#    nom_dept.append(dept_json['features'][index]['properties'].get('TYPE_2'))
+
+df_test['index']=df_test['index'].astype(str)
+
+
+# Building map with Folium
+m = folium.Map(location=[47, 1], zoom_start=5)
+
+m.choropleth(
+    geo_data=geojson_path,
+    data=df_test,
+    columns=['index', 'Var 2021-2020'],
+    key_on='feature.properties.code',
+    fill_color='OrRd',
+    fill_opacity=0.5,
+    line_opacity=0.2,
+    legend_name='Production of Soft Wheat - 2021')
+
+
+
+
 
 def color_function(feat):
     return "red" if int(feat["properties"]["code"][:1]) < 5 else "blue"
 
-folium.GeoJson(
-    geojson_path,
-    name="geojson",
-    style_function=lambda feat: {
-        "weight": 1,
-        "color": "black",
-        "opacity": 0.25,
-        "fillColor": "blue",
-        "fillOpacity": 0.25,
-    },
-    highlight_function=lambda feat: {
-        "fillColor": color_function(feat),
-        "fillOpacity": .5,
-    },
-    tooltip=folium.GeoJsonTooltip(
-        fields=['code', 'nom'],
-        aliases=['Code', 'Name'],
-        localize=True
-    ),
-).add_to(m)
+#folium.GeoJson(
+#    geojson_path,
+#    name="geojson",
+#    style_function=lambda feat: {
+#        "weight": 1,
+#        "color": "black",
+#        "opacity": 0.25,
+#        "fillColor": "blue",
+#        "fillOpacity": 0.25,
+#   },
+#    highlight_function=lambda feat: {
+#        "fillColor": color_function(feat),
+#        "fillOpacity": .5,
+#    },
+#    tooltip=folium.GeoJsonTooltip(
+#        fields=['code', 'nom'],
+#        aliases=['Code', 'Name'],
+#        localize=True
+#    ),
+#).add_to(m)
 
 folium_static(m)
