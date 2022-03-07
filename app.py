@@ -6,20 +6,21 @@ import folium
 import os
 import pandas as pd
 
+
 st.title('DEEPAGRI - Forecasting French Soft Wheat Production in 2022')
 
+m = folium.Map(location=[47, 1], zoom_start=5)
 
-m = folium.Map(location=[47, 1], zoom_start=6)
+geojson_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/deepagri/data/departements.json?token=GHSAT0AAAAAABRZSTYPRBKUPX6I2JWETXZEYRGDUUQ'
+#cities_path = '/Users/pierre/code/PierreCeraH/deepagri/raw_data/lewagon_cities.csv'
 
-geojson_path = os.path.join("data", "departements.json")
-cities_path = os.path.join("data", "lewagon_cities.csv")
+#for _, city in pd.read_csv(cities_path).iterrows():
 
-for _, city in pd.read_csv(cities_path).iterrows():
-    folium.Marker(
-        location=[city.lat, city.lon],
-        popup=city.city,
-        icon=folium.Icon(color="red", icon="info-sign"),
-    ).add_to(m)
+#    folium.Marker(
+#        location=[city.lat, city.lon],
+#        popup=city.city,
+#        icon=folium.Icon(color="red", icon="info-sign"),
+#    ).add_to(m)
 
 def color_function(feat):
     return "red" if int(feat["properties"]["code"][:1]) < 5 else "blue"
@@ -31,7 +32,7 @@ folium.GeoJson(
         "weight": 1,
         "color": "black",
         "opacity": 0.25,
-        "fillColor": color_function(feat),
+        "fillColor": "blue",
         "fillOpacity": 0.25,
     },
     highlight_function=lambda feat: {
@@ -46,5 +47,3 @@ folium.GeoJson(
 ).add_to(m)
 
 folium_static(m)
-
-bt = st.button('Calculate fare')

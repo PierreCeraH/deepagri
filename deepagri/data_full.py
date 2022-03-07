@@ -9,7 +9,7 @@ import os
 
 PATH=os.path.dirname(os.path.dirname(__file__))
 
-def get_df_full(agg_type='S'):
+def get_df_full(agg_type='S', **kwargs):
     '''
     Return a dataframe with all the data of meteo of the year and the year before,
     prices ratios, population, yield n-1 and price of the matos.
@@ -17,7 +17,7 @@ def get_df_full(agg_type='S'):
     df_pop=get_data_population()
     df_prices=get_prices()
     df_prod=get_production()
-    df_meteo=agg_meteo(agg_type=agg_type)
+    df_meteo=agg_meteo(agg_type=agg_type, **kwargs)
     df_rendement=get_data_rendement()
     df_matos=pd.read_csv(os.path.join(os.path.join(PATH,'raw_data'),'matos.csv'),index_col='0')
 

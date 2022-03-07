@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from psutil import NIC_DUPLEX_FULL
 from deepagri.data_full import get_df_full
 from sklearn.preprocessing import RobustScaler
 from sklearn.pipeline import Pipeline
@@ -9,7 +10,10 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error
 from sklearn.inspection import permutation_importance
 
-def build_model(model=None):
+
+
+def run_model(agg_type="M", model=None, metrics=["mae"], scaler=None, X=None,
+              y=None, **kwargs):
     """
     Fits and returns a model (default XGB), printing selected metrics holding out
     the last year (default mae) and permutation importance on the full data.
@@ -26,30 +30,29 @@ def build_model(model=None):
     elif model=='linear_reg':
         model=LinearRegression()
 
-    scaler=RobustScaler()
+
+    if scaler==None:
+        scaler=RobustScaler()
+
     pipe=Pipeline([
                 ('Scaler',scaler),
                 ('Model',model)
                 ])
     return pipe
 
-def fit_model(pipe,X,y):
-    '''
-    Return a fitted model with the X and y provided
-    '''
-    pipe.fit(X,y)
+    df = get_df_full(agg_type=agg_type, **kwargs)
 
-    return pipe
+    n_departements=int(df.index.str[5:].nunique())
 
-def cross_val_model(def_model,X,y, cv=5, nb_dep_par_annee=93):
-    '''
-    Execute a cross validation of the model and return a mae score.
-    def_model: function that return a model not fitted
-    X,y : the full X and y df
-    cv: number of year to train on for each fold
-    nb_dep_par_annee : nombre de departements qui composent une année
-    '''
-    score=[]
+    if X==None:
+        X=df.drop(columns=['Production'])
+    if y==None:
+        y=df['Production']
+
+    X_train=X[:-n_departements]
+    y_train=y[:-n_departements]
+    X_test=X[-n_departements:]
+    y_test=y[-n_departements:]
 
     train_size=cv
     test_size=train_size+1
@@ -58,10 +61,9 @@ def cross_val_model(def_model,X,y, cv=5, nb_dep_par_annee=93):
         rang_split=i+nb_dep_par_annee*train_size
         rang_max_test=i+nb_dep_par_annee*test_size
 
-        X_train=X[i:rang_split]
-        X_test=X[rang_split:rang_max_test]
-        y_train=y[i:rang_split]
-        y_test=y[rang_split:rang_max_test]
+    results = []
+    if "mae" in metrics:
+        results.append(("mae", mean_absolute_error(y_test, y_pred)))
 
         if X_test.shape[0]==0:
             break
