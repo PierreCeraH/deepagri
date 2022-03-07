@@ -8,7 +8,7 @@ from xgboost import XGBRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.inspection import permutation_importance
 
-def run_model(agg_type="M", model=None, metrics=["mae"]):
+def build_model(model=None):
     """
     Fits and returns a model (default XGB), printing selected metrics holding out
     the last year (default mae) and permutation importance on the full data.
@@ -29,31 +29,71 @@ def run_model(agg_type="M", model=None, metrics=["mae"]):
             ('Model',model)
     ])
 
-    df = get_df_full(agg_type=agg_type)
+    return pipe
+
+def fit_model(pipe,X,y):
+    '''
+    Return a fitted model with the X and y provided
+    '''
+    pipe.fit(X,y)
+
+    return pipe
+
+def cross_val_model(def_model,X,y, cv=5, nb_dep_par_annee=93):
+    '''
+    Execute a cross validation of the model and return a mae score.
+    def_model: function that return a model not fitted
+    X,y : the full X and y df
+    cv: number of year to train on for each fold
+    nb_dep_par_annee : nombre de departements qui composent une année
+    '''
+    score=[]
+
+    train_size=cv
+    test_size=train_size+1
+
+    for i in range(0,X.shape[0]-nb_dep_par_annee,nb_dep_par_annee):
+        rang_split=i+nb_dep_par_annee*train_size
+        rang_max_test=i+nb_dep_par_annee*test_size
+
+        X_train=X[i:rang_split]
+        X_test=X[rang_split:rang_max_test]
+        y_train=y[i:rang_split]
+        y_test=y[rang_split:rang_max_test]
+
+        if X_test.shape[0]==0:
+            break
+        model=def_model()
+        model=fit_model(model,X_train,y_train)
+        score.append(mean_absolute_error(y_true=y_test,y_pred=model.predict(X_test)))
+
+    return score
+
+def permutation_score(pipe,X,y):
+    permutation_score = permutation_importance(pipe, X, y, n_repeats=10)
+    importance_df = pd.DataFrame(np.vstack((X.columns,permutation_score.importances_mean)).T) # Unstack results from permutation_score
+    importance_df.columns=['feature','score decrease']
+    return importance_df.sort_values(by="score decrease", ascending = False)
+
+def full_model(cross_val=False):
+    '''
+    Return a model fitted with the full data and a score of cross_val(if on True)
+    '''
+    model=build_model
+
+    df=get_df_full()
 
     X=df.drop(columns=['Production'])
     y=df['Production']
 
-    X_test=X[-93:]
-    y_test=y[-93:]
-    X_train=X[:-93]
-    y_train=y[:-93]
+    if cross_val:
+        score=cross_val_model(model,X,y)
+    else :
+        score=[]
 
-    pipe.fit(X_train,y_train)
+    model=fit_model(model(),X,y)
 
-    y_pred=pipe.predict(X_test)
+    return model,score
 
-    results = []
-    if "mae" in metrics:
-        results.append("mae", mean_absolute_error(y_test, y_pred))
-
-    print(results[0][0] + ": " + results[0][1])
-
-    pipe.fit(X, y)
-
-    permutation_score = permutation_importance(pipe, X, y, n_repeats=10)
-    importance_df = pd.DataFrame(np.vstack((X.columns,permutation_score.importances_mean)).T) # Unstack results from permutation_score
-
-    print(importance_df.sort_values(by="score decrease", ascending = False))
-
-    return model
+if __name__=='__main__':
+    print(full_model(True))
