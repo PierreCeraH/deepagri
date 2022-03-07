@@ -6,12 +6,13 @@ import folium
 import os
 import pandas as pd
 
+
 st.title('DEEPAGRI - Forecasting French Soft Wheat Production in 2022')
 
 m = folium.Map(location=[47, 1], zoom_start=5)
 
-geojson_path = '/Users/pierre/code/PierreCeraH/deepagri/raw_data/departements.json'
-cities_path = '/Users/pierre/code/PierreCeraH/deepagri/raw_data/lewagon_cities.csv'
+geojson_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/deepagri/data/departements.json?token=GHSAT0AAAAAABRZSTYPRBKUPX6I2JWETXZEYRGDUUQ'
+#cities_path = '/Users/pierre/code/PierreCeraH/deepagri/raw_data/lewagon_cities.csv'
 
 #for _, city in pd.read_csv(cities_path).iterrows():
 
@@ -31,7 +32,7 @@ folium.GeoJson(
         "weight": 1,
         "color": "black",
         "opacity": 0.25,
-        "fillColor": color_function(feat),
+        "fillColor": "blue",
         "fillOpacity": 0.25,
     },
     highlight_function=lambda feat: {
