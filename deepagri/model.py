@@ -77,23 +77,39 @@ def permutation_score(pipe,X,y):
     importance_df.columns=['feature','score decrease']
     return importance_df.sort_values(by="score decrease", perascending = False)
 
-def full_model(cross_val=False):
+def holdout_score(model, X, y, holdout=93):
+    X_train=X[:-holdout]
+    X_test=X[-holdout:]
+    y_train=y[:-holdout]
+    y_test=y[-holdout:]
+
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    score = mean_absolute_error(y_test, y_pred)
+
+    return score
+
+def full_model(model=None, cross_val=False, df=pd.DataFrame(), X=pd.DataFrame(),
+               y=pd.DataFrame(), holdout=93, **kwargs):
     '''
     Return a model fitted with the full data and a score of cross_val(if on True)
     '''
-    model=build_model
+    model=build_model(model)
 
-    df=get_df_full()
+    if df.empty:
+        df=get_df_full(**kwargs)
 
-    X=df.drop(columns=['Production'])
-    y=df['Production']
+    if X.empty:
+        X=df.drop(columns=['Production'])
+    if y.empty:
+        y=df['Production']
 
     if cross_val:
         score=cross_val_model(model,X,y)
     else :
-        score=[]
+        score=holdout_score(model, X, y, holdout)
 
-    model=fit_model(model(),X,y)
+    model=fit_model(model,X,y)
 
     return model,score
 
