@@ -2,6 +2,7 @@ from deepagri.meteo_agg import agg_meteo
 from deepagri.data_pop import get_data_population
 from deepagri.data_price import get_prices_2022
 from deepagri.data_rendement import get_data_rendement
+from deepagri.data_region_ohe import ohe_regions
 
 import pandas as pd
 
@@ -131,4 +132,4 @@ def get_X_pred(agg_type="W"):
     data_rend = get_data_rendement()
     df_final_predict = df_final_predict.merge(data_rend,right_index=True, left_index=True)
 
-    return df_final_predict
+    return ohe_regions(df_final_predict)
