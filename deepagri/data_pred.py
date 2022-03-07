@@ -23,7 +23,6 @@ def get_X_pred(agg_type="W"):
     for i in df_2022.columns :
         if not(i[0] in list_col) :
             list_col.append(i[0])
-    list_col
 
     # 2021 to 2022 meteo
 
@@ -34,41 +33,77 @@ def get_X_pred(agg_type="W"):
     df_2021 = df_meteo[list_]
 
     colum = df_2021['tmax_c'].columns
+    if agg_type == "W" :
+        list_weeks = colum
+        list_weeks_2021 = list(list_weeks[9:21])
+        list_weeks_2021_2022 = list(list_weeks[21:53])
 
-    list_weeks = colum
-    list_weeks_2021 = list(list_weeks[9:21])
-    list_weeks_2021_2022 = list(list_weeks[21:53])
+        list_weeks_2022 = list(list_weeks[0:9])
 
-    list_weeks_2022 = list(list_weeks[0:9])
+        list_compl_weeks = list_weeks_2021_2022
 
-    list_compl_weeks = list_weeks_2021_2022
+        for i in list_weeks[0:21] :
+            list_compl_weeks.append(i)
 
-    for i in list_weeks[0:21] :
-        list_compl_weeks.append(i)
+        for i in list_weeks[21:53] :
+            list_weeks_2021.append(i)
 
-    for i in list_weeks[21:53] :
-        list_weeks_2021.append(i)
+        list_weeks_2021_fin =  list_weeks_2021[12:]
+        list_weeks_2021_fin.extend(list_weeks_2021[0:12])
 
-    list_weeks_2021_fin =  list_weeks_2021[12:]
-    list_weeks_2021_fin.extend(list_weeks_2021[0:12])
+        list_tuples = []
+        for i in list_col :
+            for j in list_compl_weeks :
+                list_tuples.append((i,j))
 
-    list_tuples = []
-    for i in list_col :
-        for j in list_compl_weeks :
-            list_tuples.append((i,j))
+        index = pd.MultiIndex.from_tuples(list_tuples, names=["", "week_of_year"])
 
-    index = pd.MultiIndex.from_tuples(list_tuples, names=["", "week_of_year"])
+        df_final_predict = pd.DataFrame(index=df_2022.index, columns=index)
 
-    df_final_predict = pd.DataFrame(index=df_2022.index, columns=index)
+        for i in list_col :
 
-    for i in list_col :
+            for j in list_weeks_2022 :
+                col = df_2022[i,j]
+                df_final_predict[i,j] = col
+            for j in list_weeks_2021_fin :
+                col = df_2021[i,j]
+                df_final_predict[i,j] = list(col)
 
-        for j in list_weeks_2022 :
-            col = df_2022[i,j]
-            df_final_predict[i,j] = col
-        for j in list_weeks_2021_fin :
-            col = df_2021[i,j]
-            df_final_predict[i,j] = list(col)
+    elif agg_type == "M" :
+
+        list_months = colum
+        list_months_2021 = list(list_months[2:5])
+        list_months_2021_2022 = list(list_months[5:])
+
+        list_months_2022 = list(list_months[0:2])
+
+        list_compl_months = list_months_2021_2022
+
+        for i in list_months[0:5] :
+            list_compl_months.append(i)
+
+        for i in list_months[5:] :
+            list_months_2021.append(i)
+
+        list_tuples = []
+        for i in list_col :
+            for j in list_compl_months :
+                list_tuples.append((i,j))
+        list_tuples
+        index = pd.MultiIndex.from_tuples(list_tuples, names=["", "months_of_year"])
+        df_final_predict = pd.DataFrame(index=df_2022.index, columns=index)
+
+        for i in list_col :
+
+            for j in list_months_2022 :
+                col = df_2022[i,j]
+                df_final_predict[i,j] = col
+            for j in list_months_2021 :
+                col = df_2021[i,j]
+                df_final_predict[i,j] = list(col)
+
+    else :
+        ValueError('il faut rentrer M ou W')
 
     df_final_predict.columns=[' '.join(col).strip() for col in df_final_predict.columns.values] #Suppression du multiindex des columns
     df_final_predict.columns = df_final_predict.columns.get_level_values(0)
