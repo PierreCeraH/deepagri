@@ -11,8 +11,8 @@ st.title('DEEPAGRI - Forecasting French Soft Wheat Production in 2022')
 
 m = folium.Map(location=[47, 1], zoom_start=5)
 
-#geojson_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/deepagri/data/departements.json?token=GHSAT0AAAAAABRZSTYPRBKUPX6I2JWETXZEYRGDUUQ'
-geojson_path = '/Users/pierre/code/PierreCeraH/deepagri/raw_data/departements.json'
+geojson_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/deepagri/data/departements.json?token=GHSAT0AAAAAABRZSTYPRBKUPX6I2JWETXZEYRGDUUQ'
+
 #cities_path = '/Users/pierre/code/PierreCeraH/deepagri/raw_data/lewagon_cities.csv'
 
 #for _, city in pd.read_csv(cities_path).iterrows():
