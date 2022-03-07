@@ -1,3 +1,4 @@
+from asyncore import file_dispatcher
 import streamlit as st
 import datetime
 import requests
@@ -12,7 +13,8 @@ st.title('DEEPAGRI - Forecasting French Soft Wheat Production in 2022')
 geojson_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/deepagri/data/departements.json?token=GHSAT0AAAAAABRZSTYPRBKUPX6I2JWETXZEYRGDUUQ'
 
 # Dataframe Preprocessing
-filepath = os.path.join('Users','pierre','code','PierreCeraH','deepagri','raw_data','cleaned','Production_Y.xlsx')
+#filepath = os.path.join('Users','pierre','code','PierreCeraH','deepagri','raw_data','cleaned','Production_Y.xlsx')
+filepath = '/Users/pierre/code/PierreCeraH/deepagri/raw_data/cleaned/Production_Y.xlsx'
 df = pd.read_excel(filepath)
 
 df = df.drop('Prod.(t)',axis=1)
@@ -44,24 +46,28 @@ df_test['index']=df_test['index'].astype(str)
 
 
 # Building map with Folium
-m = folium.Map(location=[47, 1], zoom_start=5)
+m = folium.Map(location=[47, 1],
+               tiles='cartodb positron',
+               min_zoom=2,
+               max_zoom=7,
+               zoom_start=5)
 
 m.choropleth(
     geo_data=geojson_path,
     data=df_test,
     columns=['index', 'Var 2021-2020'],
     key_on='feature.properties.code',
-    fill_color='OrRd',
-    fill_opacity=0.5,
-    line_opacity=0.2,
+    fill_color='YlOrBr',
+    fill_opacity=0.6,
+    line_opacity=0.4,
     legend_name='Production of Soft Wheat - 2021')
 
 
 
 
 
-def color_function(feat):
-    return "red" if int(feat["properties"]["code"][:1]) < 5 else "blue"
+#def color_function(feat):
+    #return "red" if int(feat["properties"]["code"][:1]) < 5 else "blue"
 
 #folium.GeoJson(
 #    geojson_path,
