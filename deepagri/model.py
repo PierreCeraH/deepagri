@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from psutil import NIC_DUPLEX_FULL
 from deepagri.data_full import get_df_full
 from sklearn.preprocessing import RobustScaler
 from sklearn.pipeline import Pipeline
@@ -8,7 +9,10 @@ from xgboost import XGBRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.inspection import permutation_importance
 
-def run_model(agg_type="M", model=None, metrics=["mae"]):
+
+
+def run_model(agg_type="M", model=None, metrics=["mae"], scaler=None, X=None,
+              y=None, **kwargs):
     """
     Fits and returns a model (default XGB), printing selected metrics holding out
     the last year (default mae) and permutation importance on the full data.
@@ -23,21 +27,28 @@ def run_model(agg_type="M", model=None, metrics=["mae"]):
     if model==None:
         model=XGBRegressor(max_depth=10, n_estimators=100, learning_rate=0.1)
 
-    scaler=RobustScaler()
+
+    if scaler==None:
+        scaler=RobustScaler()
+
     pipe=Pipeline([
             ('Scaler',scaler),
             ('Model',model)
     ])
 
-    df = get_df_full(agg_type=agg_type)
+    df = get_df_full(agg_type=agg_type, **kwargs)
 
-    X=df.drop(columns=['Production'])
-    y=df['Production']
+    n_departements=int(df.index.str[5:].nunique())
 
-    X_test=X[-93:]
-    y_test=y[-93:]
-    X_train=X[:-93]
-    y_train=y[:-93]
+    if X==None:
+        X=df.drop(columns=['Production'])
+    if y==None:
+        y=df['Production']
+
+    X_train=X[:-n_departements]
+    y_train=y[:-n_departements]
+    X_test=X[-n_departements:]
+    y_test=y[-n_departements:]
 
     pipe.fit(X_train,y_train)
 
@@ -45,7 +56,7 @@ def run_model(agg_type="M", model=None, metrics=["mae"]):
 
     results = []
     if "mae" in metrics:
-        results.append("mae", mean_absolute_error(y_test, y_pred))
+        results.append(("mae", mean_absolute_error(y_test, y_pred)))
 
     print(results[0][0] + ": " + results[0][1])
 
