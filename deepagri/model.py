@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from psutil import NIC_DUPLEX_FULL
 from deepagri.data_full import get_df_full
 from sklearn.preprocessing import RobustScaler
 from sklearn.pipeline import Pipeline
@@ -10,10 +9,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error
 from sklearn.inspection import permutation_importance
 
-
-
-def run_model(agg_type="M", model=None, metrics=["mae"], scaler=None, X=None,
-              y=None, **kwargs):
+def build_model(model=None):
     """
     Fits and returns a model (default XGB), printing selected metrics holding out
     the last year (default mae) and permutation importance on the full data.
@@ -30,29 +26,30 @@ def run_model(agg_type="M", model=None, metrics=["mae"], scaler=None, X=None,
     elif model=='linear_reg':
         model=LinearRegression()
 
-
-    if scaler==None:
-        scaler=RobustScaler()
-
+    scaler=RobustScaler()
     pipe=Pipeline([
                 ('Scaler',scaler),
                 ('Model',model)
                 ])
     return pipe
 
-    df = get_df_full(agg_type=agg_type, **kwargs)
+def fit_model(pipe,X,y):
+    '''
+    Return a fitted model with the X and y provided
+    '''
+    pipe.fit(X,y)
 
-    n_departements=int(df.index.str[5:].nunique())
+    return pipe
 
-    if X==None:
-        X=df.drop(columns=['Production'])
-    if y==None:
-        y=df['Production']
-
-    X_train=X[:-n_departements]
-    y_train=y[:-n_departements]
-    X_test=X[-n_departements:]
-    y_test=y[-n_departements:]
+def cross_val_model(def_model,X,y, cv=5, nb_dep_par_annee=93):
+    '''
+    Execute a cross validation of the model and return a mae score.
+    def_model: function that return a model not fitted
+    X,y : the full X and y df
+    cv: number of year to train on for each fold
+    nb_dep_par_annee : nombre de departements qui composent une année
+    '''
+    score=[]
 
     train_size=cv
     test_size=train_size+1
@@ -61,9 +58,10 @@ def run_model(agg_type="M", model=None, metrics=["mae"], scaler=None, X=None,
         rang_split=i+nb_dep_par_annee*train_size
         rang_max_test=i+nb_dep_par_annee*test_size
 
-    results = []
-    if "mae" in metrics:
-        results.append(("mae", mean_absolute_error(y_test, y_pred)))
+        X_train=X[i:rang_split]
+        X_test=X[rang_split:rang_max_test]
+        y_train=y[i:rang_split]
+        y_test=y[rang_split:rang_max_test]
 
         if X_test.shape[0]==0:
             break
