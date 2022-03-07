@@ -32,9 +32,10 @@ def run_model(agg_type="M", model=None, metrics=["mae"], scaler=None, X=None,
         scaler=RobustScaler()
 
     pipe=Pipeline([
-            ('Scaler',scaler),
-            ('Model',model)
-    ])
+                ('Scaler',scaler),
+                ('Model',model)
+                ])
+    return pipe
 
     df = get_df_full(agg_type=agg_type, **kwargs)
 
@@ -50,21 +51,50 @@ def run_model(agg_type="M", model=None, metrics=["mae"], scaler=None, X=None,
     X_test=X[-n_departements:]
     y_test=y[-n_departements:]
 
-    pipe.fit(X_train,y_train)
+    train_size=cv
+    test_size=train_size+1
 
-    y_pred=pipe.predict(X_test)
+    for i in range(0,X.shape[0]-nb_dep_par_annee,nb_dep_par_annee):
+        rang_split=i+nb_dep_par_annee*train_size
+        rang_max_test=i+nb_dep_par_annee*test_size
 
     results = []
     if "mae" in metrics:
         results.append(("mae", mean_absolute_error(y_test, y_pred)))
 
-    print(results[0][0] + ": " + results[0][1])
+        if X_test.shape[0]==0:
+            break
+        model=def_model()
+        model=fit_model(model,X_train,y_train)
+        score.append(mean_absolute_error(y_true=y_test,y_pred=model.predict(X_test)))
 
-    pipe.fit(X, y)
+    return score
 
+def permutation_score(pipe,X,y):
     permutation_score = permutation_importance(pipe, X, y, n_repeats=10)
     importance_df = pd.DataFrame(np.vstack((X.columns,permutation_score.importances_mean)).T) # Unstack results from permutation_score
+    importance_df.columns=['feature','score decrease']
+    return importance_df.sort_values(by="score decrease", ascending = False)
 
-    print(importance_df.sort_values(by="score decrease", ascending = False))
+def full_model(cross_val=False):
+    '''
+    Return a model fitted with the full data and a score of cross_val(if on True)
+    '''
+    model=build_model
 
-    return model
+    df=get_df_full()
+
+    X=df.drop(columns=['Production'])
+    y=df['Production']
+
+    if cross_val:
+        score=cross_val_model(model,X,y)
+    else :
+        score=[]
+
+    model=fit_model(model(),X,y)
+
+    return model,score
+
+if __name__=='__main__':
+    print(full_model(True))

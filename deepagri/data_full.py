@@ -39,4 +39,4 @@ def get_df_full(agg_type='S', **kwargs):
     return df
 
 if __name__=='__main__':
-    print(get_df_full('M'))
+    print(get_df_full('W'))
