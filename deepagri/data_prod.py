@@ -104,7 +104,7 @@ def get_df_all(what='rendement'):
 
     df_return = df_return.rename(columns={0:what})
     df_return = df_return.reset_index()
-    df_return['Ind']=df_return['Année'].astype(str)+'-'+df_return['level_1'].astype(str)
+    df_return['Ind']=df_return['Année'].astype(int).astype(str)+'-'+df_return['level_1'].astype(str)
 
     df_return = df_return.drop(['level_1','Année'], axis=1)
     df_return = df_return.set_index('Ind')
@@ -112,4 +112,4 @@ def get_df_all(what='rendement'):
     return df_return
 
 if __name__=='__main__':
-    print(get_production())
+    print(get_df_all())

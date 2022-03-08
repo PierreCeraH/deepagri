@@ -6,6 +6,9 @@ PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)),'raw_data')
 
 
 def get_data_rendement():
+    '''
+    Renvoi le rendement de l'année n-1
+    '''
     df = pd.read_excel(os.path.join(PATH,'Histo_data_YieldsAreasProd.xlsx'))
     df = df.rename(columns={'Unnamed: 0':'ANNEE'})
 
@@ -15,12 +18,12 @@ def get_data_rendement():
     cols = df.columns
     cols_to_drop = []
     for col in cols :
-        if '2' not in col:
+        if '1' not in col:
             cols_to_drop.append(col)
 
     df = df.drop(cols_to_drop, axis=1)
 
-    df = df.drop('TOTAL.2', axis=1)
+    df = df.drop('TOTAL.1', axis=1)
     df = df.loc[2009:,:]
 
     cols = df.columns
@@ -46,7 +49,7 @@ def get_data_rendement():
 
     df_surfaces = pd.DataFrame(df.stack())
 
-    df_surfaces = df_surfaces.rename(columns={0:'Prod_n-1'})
+    df_surfaces = df_surfaces.rename(columns={0:'Rend_n-1'})
     df_surfaces = df_surfaces.reset_index()
     df_surfaces['Ind']=df_surfaces['ANNEE'].astype(int).astype(str)+'-'+df_surfaces['level_1'].astype(str)
 
