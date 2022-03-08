@@ -4,7 +4,7 @@ from deepagri.data_price import get_prices
 from deepagri.data_prod import get_production
 from deepagri.meteo_agg import agg_meteo
 from deepagri.data_rendement import get_data_rendement
-from deepagri.data_region_ohe import ohe_regions, ohe_cluster_prod
+from deepagri.data_region_ohe import ohe_regions, ohe_cluster_prod, ohe_13_regions
 import os
 
 PATH=os.path.dirname(os.path.dirname(__file__))
@@ -20,6 +20,7 @@ def get_df_full(agg_type='S', ohe='full', **kwargs):
         department identification
         - 'full' -> OHE on department number
         - 'prod_cluster' -> OHE on departments clustered into 5 by production
+        - 'regions_france' -> OHE on departments split by Région
     '''
     df_pop=get_data_population()
     df_prices=get_prices()
@@ -45,6 +46,8 @@ def get_df_full(agg_type='S', ohe='full', **kwargs):
         df=ohe_regions(df)
     if ohe=='prod_cluster':
         df=ohe_cluster_prod(df)
+    if ohe=='regions_france':
+        df=ohe_13_regions(df)
 
     return df
 
