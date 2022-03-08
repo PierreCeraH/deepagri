@@ -24,25 +24,20 @@ df = df.reset_index()
 
 df.fillna(0,inplace=True)
 
+# Calculating yearly variations in production
 for i in range(2001,2022):
     df[f'Var {i}-{i-1}']=round((df[i]-df[i-1])/df[i-1]*100,2)
 
 df = df.drop([i for i in range(2000,2022)], axis=1)
 
-#Only one year for testing
+# Only one year for testing
 df_test = df[['index','Var 2021-2020']]
 
-
-#Getting GEOJSON file
-#nom_dept = []
-
-#with open(geojson_path) as dept_file :
-#    dept_json = json.load(dept_file)
-
-#for index in range(len(dept_json['features'])):
-#    nom_dept.append(dept_json['features'][index]['properties'].get('TYPE_2'))
-
 df_test['index']=df_test['index'].astype(str)
+
+# Correcting the problem of '0' with integer below 10
+for i in range(0,9):
+    df_test['index'][i]= '0' + df_test['index'][i]
 
 
 # Building map with Folium
@@ -50,7 +45,8 @@ m = folium.Map(location=[47, 1],
                tiles='cartodb positron',
                min_zoom=2,
                max_zoom=7,
-               zoom_start=5)
+               zoom_start=6)
+
 
 m.choropleth(
     geo_data=geojson_path,
@@ -60,7 +56,8 @@ m.choropleth(
     fill_color='YlOrBr',
     fill_opacity=0.6,
     line_opacity=0.4,
-    legend_name='Production of Soft Wheat - 2021')
+    legend_name='Production of Soft Wheat - 2021',
+    bins=[-60, -20, 20, 60, 100, 140, 180, 220])
 
 
 
