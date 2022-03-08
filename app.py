@@ -69,13 +69,13 @@ st.markdown('')
 st.markdown('')
 
 # Build a DataFrame with Cities and lat long in columns
-#def get_map_data():
-#    return pd.DataFrame(
-#            np.random.randn(1000, 2) / [50, 50] + [37.76, -122.4],
-#            columns=['lat', 'lon'])
+def get_map_data():
+    return pd.DataFrame(
+            np.random.randn(1000, 2) / [50, 50] + [37.76, -122.4],
+            columns=['lat', 'lon'])
 
-#df = get_map_data()
-#st.map(df)
+df_map_cities = get_map_data()
+st.map(df_map_cities)
 
 st.markdown('')
 st.markdown('')
