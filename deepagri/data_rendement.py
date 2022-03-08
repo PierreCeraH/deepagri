@@ -6,6 +6,9 @@ PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)),'raw_data')
 
 
 def get_data_rendement():
+    '''
+    Renvoi le rendement de l'année n-1
+    '''
     df = pd.read_excel(os.path.join(PATH,'Histo_data_YieldsAreasProd.xlsx'))
     df = df.rename(columns={'Unnamed: 0':'ANNEE'})
 

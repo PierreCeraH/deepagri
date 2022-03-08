@@ -75,7 +75,7 @@ def permutation_score(pipe,X,y):
     permutation_score = permutation_importance(pipe, X, y, n_repeats=10)
     importance_df = pd.DataFrame(np.vstack((X.columns,permutation_score.importances_mean)).T) # Unstack results from permutation_score
     importance_df.columns=['feature','score decrease']
-    return importance_df.sort_values(by="score decrease", perascending = False)
+    return importance_df.sort_values(by="score decrease")
 
 def full_model(cross_val=False):
     '''
