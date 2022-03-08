@@ -41,35 +41,32 @@ def fit_model(pipe,X,y):
 
     return pipe
 
-def cross_val_model(def_model,X,y, cv=5, nb_dep_par_annee=93):
+def cross_val_model(model, data=pd.DataFrame(), target='rendement',
+                    X=pd.DataFrame(), y=pd.DataFrame()):
     '''
-    Execute a cross validation of the model and return a mae score.
-    def_model: function that return a model not fitted
-    X,y : the full X and y df
-    cv: number of year to train on for each fold
-    nb_dep_par_annee : nombre de departements qui composent une année
+    Cross-validates a model by training it on all years except target year, and
+    calculate mae for that year.
+    Returns list of mae for every year in chronological order
     '''
-    score=[]
+    if X.empty & y.empty:
+        if data.empty:
+            return ValueError("Please pass a data object, or an X and y")
+        y = data.pop(target)
+        X = data
 
-    train_size=cv
-    test_size=train_size+1
+    scores = []
+    for year in X.index.str[:4].unique():
+        X_train = X[X.index.str[:4]!=year]
+        X_test = X[X.index.str[:4]==year]
+        y_train = y[y.index.str[:4]!=year]
+        y_test = y[y.index.str[:4]==year]
 
-    for i in range(0,X.shape[0]-nb_dep_par_annee,nb_dep_par_annee):
-        rang_split=i+nb_dep_par_annee*train_size
-        rang_max_test=i+nb_dep_par_annee*test_size
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
 
-        X_train=X[i:rang_split]
-        X_test=X[rang_split:rang_max_test]
-        y_train=y[i:rang_split]
-        y_test=y[rang_split:rang_max_test]
+        scores.append(mean_absolute_error(y_test, y_pred))
 
-        if X_test.shape[0]==0:
-            break
-        model=def_model()
-        model=fit_model(model,X_train,y_train)
-        score.append(mean_absolute_error(y_true=y_test,y_pred=model.predict(X_test)))
-
-    return score
+    return scores
 
 def permutation_score(pipe,X,y):
     permutation_score = permutation_importance(pipe, X, y, n_repeats=10)
