@@ -9,14 +9,13 @@ import pandas as pd
 import json
 import numpy as np
 
-st.title('DEEPAGRI - Forecasting French Soft Wheat Production in 2022')
 
 geojson_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/deepagri/data/departements.json?token=GHSAT0AAAAAABRZSTYPRBKUPX6I2JWETXZEYRGDUUQ'
 
 # Dataframe Preprocessing
-#filepath = os.path.join('Users','pierre','code','PierreCeraH','deepagri','raw_data','cleaned','Production_Y.xlsx')
-filepath = '/Users/pierre/code/PierreCeraH/deepagri/raw_data/cleaned/Production_Y.xlsx'
-df = pd.read_excel(filepath)
+#filepath = '/Users/pierre/code/PierreCeraH/deepagri/raw_data/cleaned/Production_Y.xlsx'
+filepath = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/5d081b5a3fb2185e861d8f37f9bbeb2d88d8bbfe/deepagri/data/Production_Y.csv'
+df = pd.read_csv(filepath)
 
 df = df.drop('Prod.(t)',axis=1)
 df.set_index('Année',inplace=True)
@@ -29,8 +28,14 @@ for i in range(2001,2022):
 
 df = df.drop([i for i in range(2000,2022)], axis=1)
 
+
+
+
+st.title('Project DEEPAGRI')
+st.title('Forecasting French Soft Wheat Production in 2022')
+
 # Selecting a year with a slider
-year = st.slider('Select a year', 2001, 2021, step=1)
+year = st.slider('Select a year', 2002, 2021, step=1)
 
 # Creating the dataframe to plot
 df = df[['index',f'Var {year}-{year-1}']]
@@ -48,10 +53,9 @@ df_graph = df_graph.dropna()
 
 chart_data = df_graph[f'Var {year}-{year-1}']
 
-st.area_chart(chart_data)
-
-st.bar_chart(chart_data)
-
+columns = st.columns(2)
+col_1 = columns[0].area_chart(chart_data)
+col_2 = columns[1].bar_chart(chart_data)
 
 # Building map with Folium
 m = folium.Map(location=[47, 1],
@@ -74,3 +78,26 @@ m.choropleth(
 
 
 folium_static(m)
+
+
+
+
+
+bt = st.button('Predict 2022')
+
+if bt:
+    st.metric("French Soft Wheat 2022", "35.47 MlnT", "-1.52 MlnT")
+
+#params = {
+#    'pickup_datetime' : pickup_datetime,
+#    'pickup_longitude' : pickup_longitude,
+#    'pickup_latitude' : pickup_latitude,
+#    'dropoff_longitude' : dropoff_longitude,
+#    'dropoff_latitude' : dropoff_latitude,
+#    'passenger_count' : passenger_count
+#}
+#url = 'https://taxifare.lewagon.ai/predict'
+
+#if bt:
+#    response = requests.get(url, params).json()
+#    st.write(response['fare'])
