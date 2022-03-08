@@ -4,15 +4,23 @@ from deepagri.data_price import get_prices
 from deepagri.data_prod import get_production
 from deepagri.meteo_agg import agg_meteo
 from deepagri.data_rendement import get_data_rendement
-from deepagri.data_region_ohe import ohe_regions
+from deepagri.data_region_ohe import ohe_regions, ohe_cluster_prod, ohe_13_regions
 import os
 
 PATH=os.path.dirname(os.path.dirname(__file__))
 
-def get_df_full(agg_type='S', **kwargs):
+def get_df_full(agg_type='S', ohe='full', **kwargs):
     '''
     Return a dataframe with all the data of meteo of the year and the year before,
     prices ratios, population, yield n-1 and price of the matos.
+    ---------------
+    Parameters:
+    agg_type: String 'S', 'M' or 'W'. Aggregation type for the data.
+    ohe: String 'full', 'prod_cluster'. What one-hot encoded columns to add for
+        department identification
+        - 'full' -> OHE on department number
+        - 'prod_cluster' -> OHE on departments clustered into 5 by production
+        - 'regions_france' -> OHE on departments split by Région
     '''
     df_pop=get_data_population()
     df_prices=get_prices()
@@ -34,7 +42,12 @@ def get_df_full(agg_type='S', **kwargs):
 
     df=df.merge(df_meteo,left_index=True,right_index=True)
 
-    df=ohe_regions(df)
+    if ohe=='full':
+        df=ohe_regions(df)
+    if ohe=='prod_cluster':
+        df=ohe_cluster_prod(df)
+    if ohe=='regions_france':
+        df=ohe_13_regions(df)
 
     return df
 

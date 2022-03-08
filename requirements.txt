@@ -18,3 +18,10 @@ openpyxl==3.0.3
 # os
 streamlit
 streamlit-folium
+
+coverage
+pytest
+black
+flake8
+yapf
+six>=1.14
