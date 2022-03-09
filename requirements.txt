@@ -18,6 +18,7 @@ openpyxl==3.0.3
 # os
 streamlit
 streamlit-folium
+matplotlib
 
 coverage
 pytest
