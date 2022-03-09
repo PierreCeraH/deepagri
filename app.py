@@ -10,6 +10,7 @@ import pandas as pd
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 geojson_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/deepagri/data/departements.json?token=GHSAT0AAAAAABRZSTYPRBKUPX6I2JWETXZEYRGDUUQ'
 
@@ -92,7 +93,7 @@ col_name_2 = col_button[2].button('Predict 2022')
 col_name_3 = col_button[3].text('')
 col_name_4 = col_button[4].text('')
 
-if col_name_1:
+if col_name_2:
     st.metric("French Soft Wheat 2022", "35.47 MlnT", "+0.52 MlnT vs 2021")
     # Building choropleth map with Folium
     m = folium.Map(location=[47, 1],
@@ -111,8 +112,8 @@ if col_name_1:
         line_opacity=0.4,
         legend_name=f'Production of Soft Wheat - {year}')
     folium_static(m)
-# ---------------------------------------------------
-# Building a table with chosen department and prediction
+    # ---------------------------------------------------
+    # Building a table with chosen department and prediction
     liste_noms_dept = ['00 - FRANCE','01 - Ain','02 - Aisne','03 - Allier','04 - Alpes-de-Haute-Provence',
                    '05 - Hautes-Alpes','06 - Alpes-Maritimes','07 - Ardèche','08 - Ardennes',
                    '09 - Ariège','10 - Aube','11 - Aude','12 - Aveyron',
@@ -161,18 +162,20 @@ if col_name_1:
         df_graph_dept['index'][i]= '0' + df_graph_dept['index'][i]
     df_graph_dept.set_index('index',inplace=True)
 
-    #option = st.selectbox('Select a department', liste_noms_dept)
-    opt_num = '00'
-
-    df_graph_dept_test = df_graph_dept.loc[opt_num,:]
-
-
     option = st.selectbox('Select a department', liste_noms_dept)
     opt_num = option[:2]
 
-    df_graph_dept = df_graph_dept.loc[opt_num,:]
+    zeros = np.zeros(96)
+    df_graph_dept[2022]=zeros
+    df_graph_2022 = pd.DataFrame(np.zeros((1,len(df_graph_dept.columns))), columns=df_graph_dept.columns)
+    # ----------------------------------------------------------------------
+    df_graph_2022[2022]=40_000_000    #TO BE MODIFIED WITH 2022 PREDICTIONS
+    # ----------------------------------------------------------------------
+    df_final_graph = pd.concat((df_graph_dept.loc[opt_num,:], df_graph_2022.T),axis=1)
+    df_final_graph.rename(columns={0:option,'00':'2022'},inplace=True)
 
-    st.bar_chart(df_graph_dept)
+    st.bar_chart(df_final_graph)
+
 
     columns_names = st.columns(4)
     col_name_0 = columns_names[0].markdown("<h7 style='text-align: center; color: #708090;'>Pierre Cera-Huelva</h7>", unsafe_allow_html=True)
