@@ -50,6 +50,10 @@ def cross_val_model(model, data=pd.DataFrame(), target='rendement',
 
     Input a model and either [data + target] or [X + y]
     If all are passed, [X + y] takes priority
+
+    Returns a dictionary with:
+        - key : years
+        - value : tuple of (y_pred, mae_score)
     -------------
     Parameters:
     - model: model() object to fit / predict on
@@ -68,7 +72,7 @@ def cross_val_model(model, data=pd.DataFrame(), target='rendement',
         y = data.pop(target)
         X = data
 
-    scores = []
+    scores = {}
     for year in X.index.str[:4].unique():
         X_train = X[X.index.str[:4]!=year]
         X_test = X[X.index.str[:4]==year]
@@ -78,7 +82,7 @@ def cross_val_model(model, data=pd.DataFrame(), target='rendement',
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
 
-        scores.append(mean_absolute_error(y_test, y_pred))
+        scores[year] = ((y_pred, mean_absolute_error(y_test, y_pred)))
 
     return scores
 
