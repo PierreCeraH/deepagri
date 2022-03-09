@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_absolute_error
 
-def weighted_mae(y_test:pd.DataFrame(), y_pred:np.array(),
+def weighted_mae(y_test:pd.DataFrame(), y_pred:np.array,
                  df_prod:pd.DataFrame()):
     '''
     Returns weighted mae
@@ -20,7 +20,7 @@ def weighted_mae(y_test:pd.DataFrame(), y_pred:np.array(),
 
     return mean_absolute_error(y_test_pond, y_pred_pond) * len(y_test)
 
-def weighted_feature(df, df_prod, metric_cols=None):
+def weigh_features(df, df_prod, metric_cols=None):
     df['year'] = df.index.str[:4]
     df['dep'] = df.index.str[5:]
 
@@ -28,4 +28,11 @@ def weighted_feature(df, df_prod, metric_cols=None):
     df_plot = df_plot.drop(columns='production_n-1')
 
     if metric_cols==None:
-        metric_cols = df
+        metric_cols = df_plot.columns[:-3]
+
+    df_plot[metric_cols] = df_plot.apply(lambda x: x[metric_cols]
+                                         * x['production'], axis=1)
+
+    df_plot = df_plot.groupby('year').sum()
+
+    df_plot = df_plot.appy(lambda x: x[metric_cols] / x['production'], axis=1)
