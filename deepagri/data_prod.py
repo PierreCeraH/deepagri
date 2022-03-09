@@ -103,6 +103,7 @@ def get_df_all(what='rendement'):
     df_return = pd.DataFrame(df_return.stack())
 
     df_return = df_return.rename(columns={0:what})
+    df_return[what] = df_return[what].astype('float')
     df_return = df_return.reset_index()
     df_return['Ind']=df_return['Année'].astype(int).astype(str)+'-'+df_return['level_1'].astype(str)
 
