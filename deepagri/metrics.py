@@ -28,4 +28,11 @@ def weighted_feature(df, df_prod, metric_cols=None):
     df_plot = df_plot.drop(columns='production_n-1')
 
     if metric_cols==None:
-        metric_cols = df
+        metric_cols = df_plot.columns[:-3]
+
+    df_plot[metric_cols] = df_plot.apply(lambda x: x[metric_cols]
+                                         * x['production'], axis=1)
+
+    df_plot = df_plot.groupby('year').sum()
+
+    df_plot = df_plot.appy(lambda x: x[metric_cols] / x['production'], axis=1)
