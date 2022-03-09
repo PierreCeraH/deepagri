@@ -28,8 +28,9 @@ for i in range(2001,2022):
     df_var[f'Var {i}-{i-1}']=round((df[i]-df[i-1])/df[i-1]*100,2)
 df_var = df_var.drop([i for i in range(2000,2022)], axis=1)
 
-image = 'https://github.com/PierreCeraH/deepagri/blob/e6ae8d199201e0e4ac10a3e08c1583fd6a034694/Photo-of-a-wheat-field.jpeg'
-st.image(image, caption=None, width=None, use_column_width=None, clamp=False, channels="RGB", output_format="auto")
+image_url = 'https://github.com/PierreCeraH/deepagri/blob/master/Photo-of-a-wheat-field.jpeg?raw=true'
+#image_url = 'https://github.com/PierreCeraH/deepagri/blob/e6ae8d199201e0e4ac10a3e08c1583fd6a034694/Photo-of-a-wheat-field.jpeg'
+st.image(image_url, caption=None, width=None, use_column_width=None, clamp=False, channels="RGB", output_format="auto")
 
 
 st.markdown("<h1 style='text-align: center; color: #191970;'>DeepAgri Project</h1>", unsafe_allow_html=True)
