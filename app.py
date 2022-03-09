@@ -24,13 +24,18 @@ df = df.reset_index()
 
 # Calculating yearly variations in production
 df_var = df.copy()
+#for i in range(2001,2022):
+#    df_var[f'Var {i}-{i-1}']=round((df[i]-df[i-1])/df[i-1]*100,2)
+#df_var = df_var.drop([i for i in range(2000,2022)], axis=1)
+
 for i in range(2001,2022):
-    df_var[f'Var {i}-{i-1}']=round((df[i]-df[i-1])/df[i-1]*100,2)
+    df_var[f'Var {i}-{i-1}']=df[i]/df[i].sum()*100 - df[i-1]/df[i-1].sum()*100
 df_var = df_var.drop([i for i in range(2000,2022)], axis=1)
 
+
 image_local = '/Users/pierre/code/PierreCeraH/deepagri/Photo-of-a-wheat-field.jpeg'
-image_url = 'https://github.com/PierreCeraH/deepagri/blob/ca570a15df2298f3cd4de206d3072353f01c158f/Photo-of-a-wheat-field.jpeg'
-st.image(image_local, caption=None, width=None, use_column_width=None, clamp=False, channels="RGB", output_format="auto")
+image_url = 'https://github.com/PierreCeraH/deepagri/blob/master/photo_wheat.jpg?raw=true'
+st.image(image_url, caption=None, width=None, use_column_width=None, clamp=False, channels="RGB", output_format="auto")
 
 #st.markdown("<h1 style='text-align: center; color: #191970;'>DeepAgri Project</h1>", unsafe_allow_html=True)
 st.markdown("<h3 style='text-align: center; color: #808080;'>Forecasting French Soft Wheat Production in 2022</h3>", unsafe_allow_html=True)
@@ -41,18 +46,24 @@ st.markdown('')
 
 # ---------------------------------------------------
 # Build columns with features
+image_meteo = 'https://github.com/PierreCeraH/deepagri/blob/1967bcc27bc69827029dd6be9016982072cf3865/meteo.jpeg?raw=True'
+image_bourse = 'https://github.com/PierreCeraH/deepagri/blob/1967bcc27bc69827029dd6be9016982072cf3865/cours_bourse.jpg?raw=True'
+image_ble = 'https://github.com/PierreCeraH/deepagri/blob/1967bcc27bc69827029dd6be9016982072cf3865/ble_recole.jpg?raw=True'
+
 st.markdown("<h3 style='text-align: center; color: #408080;'>Features</h3>", unsafe_allow_html=True)
+st.markdown('')
+st.markdown('')
 col_features = st.columns(3)
 col_feat_0 = col_features[0].markdown("<h6 style='text-align: center; color: #308080;'>Weather data</h6>", unsafe_allow_html=True)
-col_feat_0 = col_features[0].image('tidi')
+col_feat_0 = col_features[0].image(image_meteo)
 col_feat_1 = col_features[1].markdown("<h6 style='text-align: center; color: #308080;'>Historical Areas & Yields </h6>", unsafe_allow_html=True)
-col_feat_1 = col_features[1].image('Predic22')
+col_feat_1 = col_features[1].image(image_ble)
 col_feat_2 = col_features[2].markdown("<h6 style='text-align: center; color: #308080;'>Historical Prices</h6>", unsafe_allow_html=True)
-col_feat_2 = col_features[2].image('frrr')
+col_feat_2 = col_features[2].image(image_bourse)
 
 # ---------------------------------------------------
 # YEAR TO MODIFY WITH 2022 ONCE MODEL IS READY AND RESULTS IN DF
-year = 2021
+year = 2017
 
 # Creating the dataframe to plot
 df_var = df_var[['index',f'Var {year}-{year-1}']]
@@ -66,6 +77,9 @@ for i in range(0,9):
 
 # ---------------------------------------------------
 # Build a map with cities
+st.markdown("<h3 style='text-align: center; color: #408080;'>Cities used for data collection</h3>", unsafe_allow_html=True)
+st.markdown('')
+
 image_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/deepagri/data/ville_name_id_coords.csv'
 df_map_cities = pd.read_csv(image_path)
 df_map_cities = df_map_cities.drop(['Unnamed: 0','id'], axis=1)
@@ -75,19 +89,21 @@ st.markdown('')
 st.markdown('')
 # ---------------------------------------------------
 # Show map with prediction
-col_button = st.columns(3)
+col_button = st.columns(5)
 col_name_0 = col_button[0].text('')
-col_name_1 = col_button[1].button('Predict 2022')
-col_name_2 = col_button[2].text('')
+col_name_1 = col_button[1].text('')
+col_name_2 = col_button[2].button('Predict 2022')
+col_name_3 = col_button[3].text('')
+col_name_4 = col_button[4].text('')
 
 if col_name_1:
     st.metric("French Soft Wheat 2022", "35.47 MlnT", "+0.52 MlnT vs 2021")
     # Building choropleth map with Folium
     m = folium.Map(location=[47, 1],
                 tiles='cartodb positron',
-                min_zoom=4,
+                min_zoom=5,
                 max_zoom=7,
-                zoom_start=6)
+                zoom_start=5.5)
 
     m.choropleth(
         geo_data=geojson_path,
@@ -142,19 +158,11 @@ if col_name_1:
 
     st.bar_chart(df_graph_dept)
 
-
-
     columns_names = st.columns(4)
     col_name_0 = columns_names[0].markdown("<h7 style='text-align: center; color: #708090;'>Pierre Cera-Huelva</h7>", unsafe_allow_html=True)
     col_name_1 = columns_names[1].markdown("<h7 style='text-align: center; color: #708090;'>Gaspar Dupas</h7>", unsafe_allow_html=True)
     col_name_2 = columns_names[2].markdown("<h7 style='text-align: center; color: #708090;'>Constantin Talandier</h7>", unsafe_allow_html=True)
     col_name_3 = columns_names[3].markdown("<h7 style='text-align: center; color: #708090;'>Wenfang Zhou</h7>", unsafe_allow_html=True)
-
-# TO DO :
-# Add the predictions for 2022 to df
-# Link the model to the predict button
-# Link df to the table
-
 
 
 # ---------------------------------------------------
