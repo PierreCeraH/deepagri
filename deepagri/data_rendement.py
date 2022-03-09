@@ -34,7 +34,7 @@ def get_data_rendement():
         i = i+1
     df = df.rename(columns=dict_col_to_rename)
 
-    dept_to_keep = [80, 62, 2, 51, 60, 26, 27, 59, 76, 77, 10, 89, 14, 20, 55, 21, 86,
+    dept_to_keep = [80, 62, 2, 51, 60, 26, 27, 59, 76, 77, 10, 89, 14, 55, 21, 86,
                     45, 8, 18, 57, 35, 61, 54, 37, 79, 36, 41, 49, 53, 72, 52, 56, 17,
                     32, 28, 85, 50, 67, 70, 3, 63, 71, 58, 78, 44, 16, 47, 91, 1, 81,
                     95, 88, 31, 68, 38, 82, 39, 25, 23, 43, 12, 22, 69, 87, 42, 24, 11,
@@ -55,7 +55,7 @@ def get_data_rendement():
 
     df_surfaces = df_surfaces.drop(['level_1','ANNEE'], axis=1)
     df_surfaces = df_surfaces.set_index('Ind')
-    df_surfaces=df_surfaces.shift(93).dropna()
+    df_surfaces=df_surfaces.shift(92).dropna()
 
     return df_surfaces
 
