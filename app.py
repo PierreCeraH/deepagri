@@ -32,12 +32,9 @@ for i in range(2001,2022):
     df_var[f'Var {i}-{i-1}']=df[i]/df[i].sum()*100 - df[i-1]/df[i-1].sum()*100
 df_var = df_var.drop([i for i in range(2000,2022)], axis=1)
 
-
-image_local = '/Users/pierre/code/PierreCeraH/deepagri/Photo-of-a-wheat-field.jpeg'
 image_url = 'https://github.com/PierreCeraH/deepagri/blob/master/photo_wheat.jpg?raw=true'
 st.image(image_url, caption=None, width=None, use_column_width=None, clamp=False, channels="RGB", output_format="auto")
 
-#st.markdown("<h1 style='text-align: center; color: #191970;'>DeepAgri Project</h1>", unsafe_allow_html=True)
 st.markdown("<h3 style='text-align: center; color: #808080;'>Forecasting French Soft Wheat Production in 2022</h3>", unsafe_allow_html=True)
 st.markdown('')
 st.markdown('')
@@ -73,7 +70,6 @@ df_var = df_var.dropna()
 # Correcting the problem of '0' with integer below 10
 for i in range(0,9):
     df_var['index'][i]= '0' + df_var['index'][i]
-
 
 # ---------------------------------------------------
 # Build a map with cities
@@ -117,7 +113,7 @@ if col_name_1:
     folium_static(m)
 # ---------------------------------------------------
 # Building a table with chosen department and prediction
-    liste_noms_dept = ['01 - Ain','02 - Aisne','03 - Allier','04 - Alpes-de-Haute-Provence',
+    liste_noms_dept = ['00 - FRANCE','01 - Ain','02 - Aisne','03 - Allier','04 - Alpes-de-Haute-Provence',
                    '05 - Hautes-Alpes','06 - Alpes-Maritimes','07 - Ardèche','08 - Ardennes',
                    '09 - Ariège','10 - Aube','11 - Aude','12 - Aveyron',
                    '13 - Bouches-du-Rhône','14 - Calvados','15 - Cantal','16 - Charente',
@@ -139,17 +135,37 @@ if col_name_1:
                    "79 - Deux-Sèvres","80 - Somme","81 - Tarn","82 - Tarn-et-Garonne",
                    "83 - Var","84 - Vaucluse","85 - Vendée","86 - Vienne",
                    "87 - Haute-Vienne","88 - Vosges","89 - Yonne","90 - Territoire de Belfort",
-                   "91 - Essonne","92 - Hauts-de-Seine","93 - Seine-Saint-Denis","94 - Val-de-Marne",
-                   "95 - Val-d'Oise"]
+                   "91 - Essonne","93 - Seine-Saint-Denis","94 - Val-de-Marne","95 - Val-d'Oise"]
 
     # Creating the dataframe to plot the barchart
-    df_graph_dept = df.copy()
+    #df_graph_dept = df.copy()
+    #df_graph_dept['index']=df_graph_dept['index'].astype(str)
+    #df_graph_dept = df_graph_dept.dropna()
+    # Correcting the problem of '0' with integer below 10
+    #for i in range(0,9):
+    #    df_graph_dept['index'][i]= '0' + df_graph_dept['index'][i]
+    #df_graph_dept.set_index('index',inplace=True)
+
+    filepath_g = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/5d081b5a3fb2185e861d8f37f9bbeb2d88d8bbfe/deepagri/data/Production_Y.csv'
+    df_g = pd.read_csv(filepath)
+    df_g.drop('Unnamed: 0',axis=1,inplace=True)
+    df_g = df_g.rename(columns={'Prod.(t)':'00'})
+    df_g.set_index('Année',inplace=True)
+    df_g = df_g.T
+    df_g = df_g.reset_index()
+    df_graph_dept = df_g.copy()
     df_graph_dept['index']=df_graph_dept['index'].astype(str)
     df_graph_dept = df_graph_dept.dropna()
     # Correcting the problem of '0' with integer below 10
     for i in range(0,9):
         df_graph_dept['index'][i]= '0' + df_graph_dept['index'][i]
     df_graph_dept.set_index('index',inplace=True)
+
+    #option = st.selectbox('Select a department', liste_noms_dept)
+    opt_num = '00'
+
+    df_graph_dept_test = df_graph_dept.loc[opt_num,:]
+
 
     option = st.selectbox('Select a department', liste_noms_dept)
     opt_num = option[:2]
