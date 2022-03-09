@@ -79,8 +79,12 @@ def get_map_data():
             np.random.randn(1000, 2) / [50, 50] + [37.76, -122.4],
             columns=['lat', 'lon'])
 
-df_map_cities = get_map_data()
-st.map(df_map_cities)
+#df_map_cities = get_map_data()
+image_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/deepagri/data/ville_name_id_coords.csv'
+df_map_cities = pd.read_csv(image_path)
+df_map_cities = df_map_cities.drop(['Unnamed: 0','id'], axis=1)
+df_map_cities = df_map_cities.rename(columns={'long':'lon'})
+st.map(df_map_cities,zoom=4)
 st.markdown('')
 st.markdown('')
 # ---------------------------------------------------
