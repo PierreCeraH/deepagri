@@ -137,7 +137,7 @@ liste_noms_dept = ['01 - Ain','02 - Aisne','03 - Allier','04 - Alpes-de-Haute-Pr
                    "91 - Essonne","92 - Hauts-de-Seine","93 - Seine-Saint-Denis","94 - Val-de-Marne",
                    "95 - Val-d'Oise"]
 
-# Creating the dataframe to plot
+# Creating the dataframe to plot the barchart
 df_graph_dept = df.copy()
 df_graph_dept['index']=df_graph_dept['index'].astype(str)
 df_graph_dept = df_graph_dept.dropna()
