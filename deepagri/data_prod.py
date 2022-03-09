@@ -109,6 +109,9 @@ def get_df_all(what='rendement'):
     df_return = df_return.drop(['level_1','Année'], axis=1)
     df_return = df_return.set_index('Ind')
 
+    df_return[what+'_n-1'] = df_return[what].shift(
+        df_return.index.astype(str).str[5:].nunique())
+
     return df_return
 
 if __name__=='__main__':
