@@ -10,7 +10,6 @@ import pandas as pd
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import misc
 
 geojson_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/deepagri/data/departements.json?token=GHSAT0AAAAAABRZSTYPRBKUPX6I2JWETXZEYRGDUUQ'
 
