@@ -20,7 +20,7 @@ def weighted_mae(y_test:pd.DataFrame(), y_pred:np.array(),
 
     return mean_absolute_error(y_test_pond, y_pred_pond) * len(y_test)
 
-def weighted_feature(df, df_prod, metric_cols=None):
+def weigh_features(df, df_prod, metric_cols=None):
     df['year'] = df.index.str[:4]
     df['dep'] = df.index.str[5:]
 
