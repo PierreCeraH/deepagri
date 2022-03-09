@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_absolute_error
 
-def weighted_mae(y_test:pd.DataFrame(), y_pred:np.array(),
+def weighted_mae(y_test:pd.DataFrame(), y_pred:np.array,
                  df_prod:pd.DataFrame()):
     '''
     Returns weighted mae
