@@ -28,27 +28,31 @@ for i in range(2001,2022):
     df_var[f'Var {i}-{i-1}']=round((df[i]-df[i-1])/df[i-1]*100,2)
 df_var = df_var.drop([i for i in range(2000,2022)], axis=1)
 
-image = 'https://github.com/PierreCeraH/deepagri/blob/e6ae8d199201e0e4ac10a3e08c1583fd6a034694/Photo-of-a-wheat-field.jpeg'
-st.image(image, caption=None, width=None, use_column_width=None, clamp=False, channels="RGB", output_format="auto")
+image_local = '/Users/pierre/code/PierreCeraH/deepagri/Photo-of-a-wheat-field.jpeg'
+image_url = 'https://github.com/PierreCeraH/deepagri/blob/ca570a15df2298f3cd4de206d3072353f01c158f/Photo-of-a-wheat-field.jpeg'
+st.image(image_local, caption=None, width=None, use_column_width=None, clamp=False, channels="RGB", output_format="auto")
 
-
-st.markdown("<h1 style='text-align: center; color: #191970;'>DeepAgri Project</h1>", unsafe_allow_html=True)
+#st.markdown("<h1 style='text-align: center; color: #191970;'>DeepAgri Project</h1>", unsafe_allow_html=True)
 st.markdown("<h3 style='text-align: center; color: #808080;'>Forecasting French Soft Wheat Production in 2022</h3>", unsafe_allow_html=True)
-
-
 st.markdown('')
-columns_names = st.columns(4)
-col_name_0 = columns_names[0].markdown("<h7 style='text-align: center; color: #708090;'>Pierre Cera-Huelva</h7>", unsafe_allow_html=True)
-col_name_1 = columns_names[1].markdown("<h7 style='text-align: center; color: #708090;'>Gaspar Dupas</h7>", unsafe_allow_html=True)
-col_name_2 = columns_names[2].markdown("<h7 style='text-align: center; color: #708090;'>Constantin Talandier</h7>", unsafe_allow_html=True)
-col_name_3 = columns_names[3].markdown("<h7 style='text-align: center; color: #708090;'>Wenfang Zhou</h7>", unsafe_allow_html=True)
 st.markdown('')
 st.markdown('')
 st.markdown('')
 
-# Selecting a year with a slider
-year = st.slider('Select a year', 2002, 2021, step=1)
-st.markdown('')
+# ---------------------------------------------------
+# Build columns with features
+st.markdown("<h3 style='text-align: center; color: #408080;'>Features</h3>", unsafe_allow_html=True)
+col_features = st.columns(3)
+col_feat_0 = col_features[0].markdown("<h6 style='text-align: center; color: #308080;'>Weather data</h6>", unsafe_allow_html=True)
+col_feat_0 = col_features[0].image('tidi')
+col_feat_1 = col_features[1].markdown("<h6 style='text-align: center; color: #308080;'>Historical Areas & Yields </h6>", unsafe_allow_html=True)
+col_feat_1 = col_features[1].image('Predic22')
+col_feat_2 = col_features[2].markdown("<h6 style='text-align: center; color: #308080;'>Historical Prices</h6>", unsafe_allow_html=True)
+col_feat_2 = col_features[2].image('frrr')
+
+# ---------------------------------------------------
+# YEAR TO MODIFY WITH 2022 ONCE MODEL IS READY AND RESULTS IN DF
+year = 2021
 
 # Creating the dataframe to plot
 df_var = df_var[['index',f'Var {year}-{year-1}']]
@@ -59,27 +63,9 @@ df_var = df_var.dropna()
 for i in range(0,9):
     df_var['index'][i]= '0' + df_var['index'][i]
 
+
 # ---------------------------------------------------
-#Creating charts
-df_graph = df_var.copy()
-df_graph = df_graph.drop(0,axis=0)
-df_graph['index']=df_graph['index'].astype(str)
-df_graph.set_index('index', inplace=True)
-df_graph = df_graph.dropna()
-
-chart_data = df_graph[f'Var {year}-{year-1}']
-
-st.bar_chart(chart_data)
-st.markdown('')
-st.markdown('')
-# ---------------------------------------------------
-# Build a DataFrame with Cities and lat long in columns
-def get_map_data():
-    return pd.DataFrame(
-            np.random.randn(1000, 2) / [50, 50] + [37.76, -122.4],
-            columns=['lat', 'lon'])
-
-#df_map_cities = get_map_data()
+# Build a map with cities
 image_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/deepagri/data/ville_name_id_coords.csv'
 df_map_cities = pd.read_csv(image_path)
 df_map_cities = df_map_cities.drop(['Unnamed: 0','id'], axis=1)
@@ -115,7 +101,7 @@ if col_name_1:
     folium_static(m)
 # ---------------------------------------------------
 # Building a table with chosen department and prediction
-liste_noms_dept = ['01 - Ain','02 - Aisne','03 - Allier','04 - Alpes-de-Haute-Provence',
+    liste_noms_dept = ['01 - Ain','02 - Aisne','03 - Allier','04 - Alpes-de-Haute-Provence',
                    '05 - Hautes-Alpes','06 - Alpes-Maritimes','07 - Ardèche','08 - Ardennes',
                    '09 - Ariège','10 - Aube','11 - Aude','12 - Aveyron',
                    '13 - Bouches-du-Rhône','14 - Calvados','15 - Cantal','16 - Charente',
@@ -140,26 +126,47 @@ liste_noms_dept = ['01 - Ain','02 - Aisne','03 - Allier','04 - Alpes-de-Haute-Pr
                    "91 - Essonne","92 - Hauts-de-Seine","93 - Seine-Saint-Denis","94 - Val-de-Marne",
                    "95 - Val-d'Oise"]
 
-# Creating the dataframe to plot the barchart
-df_graph_dept = df.copy()
-df_graph_dept['index']=df_graph_dept['index'].astype(str)
-df_graph_dept = df_graph_dept.dropna()
-# Correcting the problem of '0' with integer below 10
-for i in range(0,9):
-    df_graph_dept['index'][i]= '0' + df_graph_dept['index'][i]
-df_graph_dept.set_index('index',inplace=True)
+    # Creating the dataframe to plot the barchart
+    df_graph_dept = df.copy()
+    df_graph_dept['index']=df_graph_dept['index'].astype(str)
+    df_graph_dept = df_graph_dept.dropna()
+    # Correcting the problem of '0' with integer below 10
+    for i in range(0,9):
+        df_graph_dept['index'][i]= '0' + df_graph_dept['index'][i]
+    df_graph_dept.set_index('index',inplace=True)
 
-option = st.selectbox('Select a department', liste_noms_dept)
-opt_num = option[:2]
+    option = st.selectbox('Select a department', liste_noms_dept)
+    opt_num = option[:2]
 
-df_graph_dept = df_graph_dept.loc[opt_num,:]
+    df_graph_dept = df_graph_dept.loc[opt_num,:]
 
-st.bar_chart(df_graph_dept)
+    st.bar_chart(df_graph_dept)
 
 
 
+    columns_names = st.columns(4)
+    col_name_0 = columns_names[0].markdown("<h7 style='text-align: center; color: #708090;'>Pierre Cera-Huelva</h7>", unsafe_allow_html=True)
+    col_name_1 = columns_names[1].markdown("<h7 style='text-align: center; color: #708090;'>Gaspar Dupas</h7>", unsafe_allow_html=True)
+    col_name_2 = columns_names[2].markdown("<h7 style='text-align: center; color: #708090;'>Constantin Talandier</h7>", unsafe_allow_html=True)
+    col_name_3 = columns_names[3].markdown("<h7 style='text-align: center; color: #708090;'>Wenfang Zhou</h7>", unsafe_allow_html=True)
 
 # TO DO :
 # Add the predictions for 2022 to df
 # Link the model to the predict button
 # Link df to the table
+
+
+
+# ---------------------------------------------------
+#Creating charts
+#df_graph = df_var.copy()
+#df_graph = df_graph.drop(0,axis=0)
+#df_graph['index']=df_graph['index'].astype(str)
+#df_graph.set_index('index', inplace=True)
+#df_graph = df_graph.dropna()
+
+#chart_data = df_graph[f'Var {year}-{year-1}']
+
+#st.bar_chart(chart_data)
+#st.markdown('')
+#st.markdown('')
