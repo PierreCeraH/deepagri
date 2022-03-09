@@ -47,6 +47,20 @@ def cross_val_model(model, data=pd.DataFrame(), target='rendement',
     Cross-validates a model by training it on all years except target year, and
     calculate mae for that year.
     Returns list of mae for every year in chronological order
+
+    Input a model and either [data + target] or [X + y]
+    If all are passed, [X + y] takes priority
+    -------------
+    Parameters:
+    - model: model() object to fit / predict on
+
+    Option 1:
+    - data: pd.DataFrame(), full dataframe with X and y
+    - target: string, name of target column in data
+
+    Option 2:
+    - X: pd.DataFrame(), X dataframe
+    - y: pd.DataFrame(), y dataframe
     '''
     if X.empty & y.empty:
         if data.empty:
