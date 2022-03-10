@@ -209,10 +209,44 @@ if bt:
 
 
 
+
+    # ------------------------------------------------------------------------------
+    # BUILDING DF_CLUSTER FOR CHOROPLETH
+    # ------------------------------------------------------------------------------
+
+    df_cluster = pd.read_csv(
+        'https://raw.githubusercontent.com/PierreCeraH/deepagri/app_cluster_map/region_cluster.csv',
+        index_col=False)
+    # df_cluster = df_cluster.drop(columns='Unnamed: 0')
+    df_cluster['region'] = df_cluster['region'].astype(str).apply(lambda x: x.zfill(2))
+
+
 # ------------------------------------------------------------------------------
 # PLOTTING THE CHOROPLETH MAP WITH RESULTS
 # ------------------------------------------------------------------------------
 
+    st.markdown('### Departments of France, clustered by Production')
+    st.markdown('')
+
+    cm = folium.Map(location=[47, 1],
+                tiles='cartodb positron',
+                min_zoom=5,
+                max_zoom=7,
+                zoom_start=5.5)
+
+    cm.choropleth(
+        geo_data=geojson_path,
+        data=df_cluster,
+        columns=['region', 'cluster'],
+        key_on='feature.properties.code',
+        fill_color='YlOrBr',
+        fill_opacity=0.8,
+        line_opacity=0.4,
+        legend_name=f'Production cluster')
+
+    folium_static(cm)
+
+    st.markdown('')
     st.metric("French Soft Wheat 2022", f'{prediction_FRANCE} MlnT', f'{var_vs_2021} MlnT vs 2021')
 
     m = folium.Map(location=[47, 1],
