@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import altair as alt
 import seaborn as sns
+import time
 
 # ------------------------------------------------------------------------------
 # DEF API FUNCTION
@@ -116,6 +117,7 @@ col_name_4 = col_button[4].text('')
 #GETTING RESULTS FROM THE API & SHOWING MAP
 # ------------------------------------------------------------------------------
 if bt:
+
 # ------------------------------------------------------------------------------
 # RETRIEVING RESULTS FROM THE API
 # ------------------------------------------------------------------------------
@@ -126,7 +128,26 @@ if bt:
     df_2022.rename(columns={'Unnamed: 0':'dept'},inplace=True)
     df_2022.set_index('dept',inplace=True)
 
-    df_pred = pd.DataFrame(df_2022.apply(pred, axis=1))
+    # --------------------------------------------------------------------------
+    # ADDING A PROGRESS BAR
+    # --------------------------------------------------------------------------
+    'Starting a long computation...'
+    # Add a placeholder
+    latest_iteration = st.empty()
+    bar = st.progress(0)
+    df_pred=pd.DataFrame(columns=[0])
+
+    gif_image = 'https://github.com/PierreCeraH/deepagri/blob/master/glad_wheat.gif?raw=true'
+    st.markdown(f'<img src={gif_image}/>', unsafe_allow_html=True)
+    count = 7
+    for i,s in df_2022.iterrows():
+        df_pred.loc[i]=pred(s)
+        # Update the progress bar with each iteration.
+        bar.progress(count + 1)
+        count += 1
+    time.sleep(0.5)
+
+    #df_pred = pd.DataFrame(df_2022.apply(pred, axis=1))
 
     surfaces_2022_file = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/surfaces2022.csv'
     df_surfaces_2022 = pd.read_csv(surfaces_2022_file)
@@ -265,12 +286,13 @@ if bt:
 # PLOTTING THE EVOLUTION OF A CHOSEN DEPARTMENT PRODUCTION
 # ------------------------------------------------------------------------------
 
-    clrs = ['red' if (x == 2022) else 'blue' for x in df_final.Année]
     fig = plt.figure(figsize=(10, 4))
     plt.ylabel(f'{option[3:]}')
-    sns.barplot(x=df_final.columns,y=opt_num,data=df_final,
-                palette = clrs
-                )
+    clrs = ['#ffb482' if (x == 2022) else '#4c72b0' for x in df_final.columns]
+    values = np.array(df_final.loc['00'])
+    idx = np.array(df_final.columns)
+
+    sns.barplot(x=idx, y=values, palette=clrs)
     st.pyplot(fig)
 
     st.markdown("<h6 style='text-align: center; color: #708090;'>DeepAgri Project - Le Wagon - Data Science - Batch #802</h6>", unsafe_allow_html=True)
