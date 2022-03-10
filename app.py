@@ -15,6 +15,9 @@ import altair as alt
 import seaborn as sns
 import time
 
+
+st.session_state.pred_done = False
+
 # ------------------------------------------------------------------------------
 # DEF API FUNCTION
 # ------------------------------------------------------------------------------
@@ -229,9 +232,6 @@ def show_predict():
 
     df_var = df_var[['index', f'Var {year}-{year-1}']]
 
-
-
-
     # ------------------------------------------------------------------------------
     # BUILDING DF_CLUSTER FOR CHOROPLETH
     # ------------------------------------------------------------------------------
@@ -289,11 +289,12 @@ def show_predict():
 
     folium_static(m)
 
+    st.session_state.pred_done = True
+
     return df_var, df_final
 
 #@st.cache(suppress_st_warning=True)
 def show_table():
-    df_var, df_final = show_predict()
 
     liste_noms_dept = ['00 - FRANCE','01 - Ain','02 - Aisne','03 - Allier','04 - Alpes-de-Haute-Provence',
                 '05 - Hautes-Alpes','06 - Alpes-Maritimes','07 - Ardèche','08 - Ardennes',
@@ -343,5 +344,28 @@ def show_table():
     col_name_3 = columns_names[3].markdown("<h7 style='text-align: center; color: #708090;'>Wenfang Zhou</h7>", unsafe_allow_html=True)
 
 if bt:
-    show_predict()
+    df_var, df_final = show_predict()
+
+if st.session_state.pred_done:
     show_table()
+
+
+
+# if st.button("prediction"):
+
+#     st.write("I do the pred")
+
+#     # call the pred HERE
+
+#     st.session_state.prediction_result = pd.DataFrame(dict(a=[1, 3], b=[2, 4]))
+
+# # print the results
+# if "prediction_result" in st.session_state:
+
+#     filter = st.selectbox("select an option", ["1", "3"])
+
+#     st.session_state.prediction_result[st.session_state.prediction_result.a == int(filter)]
+
+# else:
+
+#     "pas de pred"
