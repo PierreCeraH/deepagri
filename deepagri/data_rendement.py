@@ -39,7 +39,7 @@ def get_data_rendement():
                     32, 28, 85, 50, 67, 70, 3, 63, 71, 58, 78, 44, 16, 47, 91, 1, 81,
                     95, 88, 31, 68, 38, 82, 39, 25, 23, 43, 12, 22, 69, 87, 42, 24, 11,
                     46, 90, 15, 9, 74, 34, 19, 65, 33, 64, 5, 4, 48, 30, 7, 40, 84, 73,
-                    13, 93, 94, 83, 66, 29, 6]
+                    13, 93, 94, 83, 66, 29, 6, 20]
     cols_to_drop = []
 
     for i in range(1,96):
@@ -55,7 +55,7 @@ def get_data_rendement():
 
     df_surfaces = df_surfaces.drop(['level_1','ANNEE'], axis=1)
     df_surfaces = df_surfaces.set_index('Ind')
-    df_surfaces=df_surfaces.shift(92).dropna()
+    df_surfaces=df_surfaces.shift(93).dropna()
 
     return df_surfaces
 

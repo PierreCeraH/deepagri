@@ -52,7 +52,7 @@ def predict(cluster_0,
         'tmax_deg 05':tmax_deg_05,
         'rain_mm 10_n-1':rain_mm_10_n_1,
         'rain_mm 11_n-1':rain_mm_11_n_1
-    },index=[0])
+        },index=[0])
     pipeline = joblib.load('Model_DeepAgri.joblib')
 
     pred=pipeline.predict(X_pred)
