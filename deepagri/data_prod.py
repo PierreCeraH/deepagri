@@ -79,20 +79,15 @@ def get_df_all(what='rendement'):
         df_return=df[col_surfaces].drop(['Année',2022],axis=0)
 
     dept_codes = [1,2,3,4,5,6,7,8,9,10,
-              11,12,13,14,15,16,17,
-              18,19,
-              21,22,23,24,25,26,27,28,29,
-              20,
-              30,31,32,33,34,35,36,
-              37,38,39,40,41,42,43,
-              44,45,46,47,48,49,50,
-              51,52,53,54,55,56,57,
-              58,59,60,61,62,63,64,
-              65,66,67,68,69,70,71,
-              72,73,74,75,76,77,78,
-              79,80,81,82,83,84,85,
-              86,87,88,89,90,91,92,
-              93,94,95,'FRANCE',0]
+                11,12,13,14,15,16,17,18,19,20,
+                21,22,23,24,25,26,27,28,29,30,
+                31,32,33,34,35,36,37,38,39,40,
+                41,42,43,44,45,46,47,48,49,50,
+                51,52,53,54,55,56,57,58,59,60,
+                61,62,63,64,65,66,67,68,69,70,
+                71,72,73,74,75,76,77,78,79,80,
+                81,82,83,84,85,86,87,88,89,90,
+                91,92,93,94,95,'FRANCE']
 
     col_names = df_return.columns
 
@@ -102,8 +97,9 @@ def get_df_all(what='rendement'):
 
     df_return = pd.DataFrame(df_return.stack())
 
+
     df_return = df_return.rename(columns={0:what})
-    df_return[what] = df_return[what].astype('float')
+    df_return[what]=df_return[what].astype('float64')
     df_return = df_return.reset_index()
     df_return['Ind']=df_return['Année'].astype(int).astype(str)+'-'+df_return['level_1'].astype(str)
 

@@ -26,3 +26,5 @@ black
 flake8
 yapf
 six>=1.14
+fastapi
+uvicorn
