@@ -19,6 +19,7 @@ openpyxl==3.0.3
 streamlit
 streamlit-folium
 matplotlib
+seaborn
 
 coverage
 pytest
