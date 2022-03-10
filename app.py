@@ -55,40 +55,7 @@ filepath = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/5d081b5a3fb21
 df = pd.read_csv(filepath)
 df.drop('Unnamed: 0',axis=1,inplace=True)
 
-# ------------------------------------------------------------------------------
-# BUILDING THE DF_VAR FOR THE CHOROCLETH MAP
-# ------------------------------------------------------------------------------
 
-df_var = df.copy()
-#df_gr = df.copy()
-
-df_var = df_var.drop('Prod.(t)',axis=1)
-df_var.set_index('Année',inplace=True)
-df_var = df_var.T
-df_var = df_var.reset_index()
-
-# Calculating yearly variations in production
-#for i in range(2001,2022):
-#    df_var[f'Var {i}-{i-1}']=round((df[i]-df[i-1])/df[i-1]*100,2)
-#df_var = df_var.drop([i for i in range(2000,2022)], axis=1)
-
-for i in range(2001,2022):
-    df_var[f'Var {i}-{i-1}']=df_var[i]/df_var[i].sum()*100 - df_var[i-1]/df_var[i-1].sum()*100
-df_var = df_var.drop([i for i in range(2000,2022)], axis=1)
-
-# ------------------------------------------------------------------------------
-# YEAR TO MODIFY WITH 2022 ONCE MODEL IS READY AND RESULTS IN DF
-year = 2022
-# ------------------------------------------------------------------------------
-
-# Creating the dataframe to plot
-df_var = df_var[['index',f'Var {year}-{year-1}']]
-df_var['index']=df_var['index'].astype(str)
-df_var = df_var.dropna()
-
-# Correcting the problem of '0' with integer below 10
-for i in range(0,9):
-    df_var['index'][i]= '0' + df_var['index'][i]
 
 # ------------------------------------------------------------------------------
 # SHAPING THE STREAMLIT INTERFACE
@@ -197,6 +164,49 @@ if bt:
 
     prediction_FRANCE = round(df_final[2022]['00']/1_000_000,2)
     var_vs_2021 = round((df_final[2022]['00'] - df_final[2021]['00'])/1_000_000,2)
+
+    # ------------------------------------------------------------------------------
+    # BUILDING THE DF_VAR FOR THE CHOROCLETH MAP
+    # ------------------------------------------------------------------------------
+
+    df_var = df.copy()
+
+    df_var = df_var.drop('Prod.(t)',axis=1)
+    df_var.set_index('Année',inplace=True)
+    df_var = df_var.T
+    df_var = df_var.reset_index()
+    df_var['index']=df_var['index'].astype(str).apply(lambda x: x.zfill(2))
+
+    df_var = df_var.merge(df_final[2022], left_on='index', right_index=True, how='left')
+    df_var = df_var.dropna()
+
+
+    # # Calculating yearly variations in production
+    # for i in range(2001,2022+1):
+    #    df_var[f'Var {i}-{i-1}']=round((df[i]-df[i-1])/df[i-1]*100,2)
+    # df_var = df_var.drop([i for i in range(2000,2022)], axis=1)
+
+    # ------------------------------------------------------------------------------
+    # YEAR TO MODIFY WITH 2022 ONCE MODEL IS READY AND RESULTS IN DF
+    year = 2022
+    # ------------------------------------------------------------------------------
+
+    df_var = df_var[['index',year-1, year]]
+
+    # # % Variation in % CONTRIBUTION vs. last year
+    # df_var[f'Var {year}-{year-1}'] = ((df_var[year] / df_var[year].sum()*100)
+    #                                 - (df_var[year-1] / df_var[year-1].sum()*100))
+
+    # % Variation in PRODUCTION vs. last year
+    df_var[f'Var {year}-{year-1}'] = (df_var[year] - df_var[year-1]) / df_var[year-1]*100
+
+    df_var.loc[df_var[2021]<100_000, f'Var {year}-{year-1}'] = 0
+    df_var.loc[df_var['index'].isin(['20','75']), f'Var {year}-{year-1}'] = 0 # Paris + Corse
+    df_var.loc[df_var['index']=='28', f'Var {year}-{year-1}'] = 0 # Outlier: ~+1m, +273%
+    df_var.loc[df_var['index']=='26', f'Var {year}-{year-1}'] = 0 # Outlier: ~-1m, -92%
+
+    df_var = df_var[['index', f'Var {year}-{year-1}']]
+
 
 
 # ------------------------------------------------------------------------------
