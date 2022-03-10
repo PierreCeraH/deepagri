@@ -225,15 +225,16 @@ if bt:
 # PLOTTING THE CHOROPLETH MAP WITH RESULTS
 # ------------------------------------------------------------------------------
 
-    st.metric("French Soft Wheat 2022", f'{prediction_FRANCE} MlnT', f'{var_vs_2021} MlnT vs 2021')
+    st.markdown('### Departments of France, clustered by Production')
+    st.markdown('')
 
-    m = folium.Map(location=[47, 1],
+    cm = folium.Map(location=[47, 1],
                 tiles='cartodb positron',
                 min_zoom=5,
                 max_zoom=7,
                 zoom_start=5.5)
 
-    m.choropleth(
+    cm.choropleth(
         geo_data=geojson_path,
         data=df_cluster,
         columns=['region', 'cluster'],
@@ -242,6 +243,17 @@ if bt:
         fill_opacity=0.8,
         line_opacity=0.4,
         legend_name=f'Production cluster')
+
+    folium_static(cm)
+
+    st.markdown('')
+    st.metric("French Soft Wheat 2022", f'{prediction_FRANCE} MlnT', f'{var_vs_2021} MlnT vs 2021')
+
+    m = folium.Map(location=[47, 1],
+                tiles='cartodb positron',
+                min_zoom=5,
+                max_zoom=7,
+                zoom_start=5.5)
 
     m.choropleth(
         geo_data=geojson_path,
