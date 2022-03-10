@@ -18,7 +18,7 @@ import time
 # ------------------------------------------------------------------------------
 # DEF API FUNCTION
 # ------------------------------------------------------------------------------
-
+@st.cache
 def pred(Serie):
     url='https://deepagridocker-tdgkcolwlq-ew.a.run.app/predict'
     params={
@@ -55,7 +55,6 @@ geojson_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/de
 filepath = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/5d081b5a3fb2185e861d8f37f9bbeb2d88d8bbfe/deepagri/data/Production_Y.csv'
 df = pd.read_csv(filepath)
 df.drop('Unnamed: 0',axis=1,inplace=True)
-
 
 
 # ------------------------------------------------------------------------------
@@ -116,11 +115,13 @@ col_name_4 = col_button[4].text('')
 # ------------------------------------------------------------------------------
 #GETTING RESULTS FROM THE API & SHOWING MAP
 # ------------------------------------------------------------------------------
-if bt:
-
+#if bt:
 # ------------------------------------------------------------------------------
 # RETRIEVING RESULTS FROM THE API
 # ------------------------------------------------------------------------------
+
+#@st.cache(suppress_st_warning=True)
+def show_predict():
     api_file = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/notebooks/X_pred_2022_final.csv'
     df_2022 = pd.read_csv(api_file)
     df_2022['Unnamed: 0'] = df_2022['Unnamed: 0'].str[5:]
@@ -131,7 +132,7 @@ if bt:
     # --------------------------------------------------------------------------
     # ADDING A PROGRESS BAR
     # --------------------------------------------------------------------------
-    'Starting a long computation...'
+    'Suspense...Calculating...'
     # Add a placeholder
     latest_iteration = st.empty()
     bar = st.progress(0)
@@ -288,6 +289,11 @@ if bt:
 
     folium_static(m)
 
+    return df_var, df_final
+
+#@st.cache(suppress_st_warning=True)
+def show_table():
+    df_var, df_final = show_predict()
 
     liste_noms_dept = ['00 - FRANCE','01 - Ain','02 - Aisne','03 - Allier','04 - Alpes-de-Haute-Provence',
                 '05 - Hautes-Alpes','06 - Alpes-Maritimes','07 - Ardèche','08 - Ardennes',
@@ -335,3 +341,7 @@ if bt:
     col_name_1 = columns_names[1].markdown("<h7 style='text-align: center; color: #708090;'>Gaspar Dupas</h7>", unsafe_allow_html=True)
     col_name_2 = columns_names[2].markdown("<h7 style='text-align: center; color: #708090;'>Constantin Talandier</h7>", unsafe_allow_html=True)
     col_name_3 = columns_names[3].markdown("<h7 style='text-align: center; color: #708090;'>Wenfang Zhou</h7>", unsafe_allow_html=True)
+
+if bt:
+    show_predict()
+    show_table()
