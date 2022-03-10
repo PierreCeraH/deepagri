@@ -215,7 +215,7 @@ if bt:
     # ------------------------------------------------------------------------------
 
     df_cluster = pd.read_csv(
-        'https://raw.githubusercontent.com/PierreCeraH/deepagri/app_cluster_map/region_cluster.csv',
+        'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/region_cluster.csv',
         index_col=False)
     # df_cluster = df_cluster.drop(columns='Unnamed: 0')
     df_cluster['region'] = df_cluster['region'].astype(str).apply(lambda x: x.zfill(2))
