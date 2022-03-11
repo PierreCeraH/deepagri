@@ -19,7 +19,7 @@ details = False
 # ------------------------------------------------------------------------------
 # DEF API FUNCTION
 # ------------------------------------------------------------------------------
-@st.cache
+#@st.cache
 def pred(Serie):
     url='https://deepagridocker-tdgkcolwlq-ew.a.run.app/predict'
     params={
@@ -76,32 +76,32 @@ image_meteo = 'https://github.com/PierreCeraH/deepagri/blob/1967bcc27bc69827029d
 image_bourse = 'https://github.com/PierreCeraH/deepagri/blob/1967bcc27bc69827029dd6be9016982072cf3865/cours_bourse.jpg?raw=True'
 image_ble = 'https://github.com/PierreCeraH/deepagri/blob/1967bcc27bc69827029dd6be9016982072cf3865/ble_recole.jpg?raw=True'
 
-st.markdown("<h3 style='text-align: center; color: #408080;'>Features</h3>", unsafe_allow_html=True)
-st.markdown('')
-st.markdown('')
-col_features = st.columns(3)
-col_feat_0 = col_features[0].markdown("<h6 style='text-align: center; color: #308080;'>Weather data</h6>", unsafe_allow_html=True)
-col_feat_0 = col_features[0].image(image_meteo)
-col_feat_1 = col_features[1].markdown("<h6 style='text-align: center; color: #308080;'>Historical Areas & Yields </h6>", unsafe_allow_html=True)
-col_feat_1 = col_features[1].image(image_ble)
-col_feat_2 = col_features[2].markdown("<h6 style='text-align: center; color: #308080;'>Historical Prices</h6>", unsafe_allow_html=True)
-col_feat_2 = col_features[2].image(image_bourse)
+# st.markdown("<h3 style='text-align: center; color: #408080;'>Features</h3>", unsafe_allow_html=True)
+# st.markdown('')
+# st.markdown('')
+# col_features = st.columns(3)
+# col_feat_0 = col_features[0].markdown("<h6 style='text-align: center; color: #308080;'>Weather data</h6>", unsafe_allow_html=True)
+# col_feat_0 = col_features[0].image(image_meteo)
+# col_feat_1 = col_features[1].markdown("<h6 style='text-align: center; color: #308080;'>Historical Areas & Yields </h6>", unsafe_allow_html=True)
+# col_feat_1 = col_features[1].image(image_ble)
+# col_feat_2 = col_features[2].markdown("<h6 style='text-align: center; color: #308080;'>Historical Prices</h6>", unsafe_allow_html=True)
+# col_feat_2 = col_features[2].image(image_bourse)
 
 # ------------------------------------------------------------------------------
 # BUILDING THE MAP WITH CITIES
 # ------------------------------------------------------------------------------
-st.markdown('')
-st.markdown('')
-st.markdown("<h3 style='text-align: center; color: #408080;'>Cities used for data collection</h3>", unsafe_allow_html=True)
-st.markdown('')
+# st.markdown('')
+# st.markdown('')
+# st.markdown("<h3 style='text-align: center; color: #408080;'>Cities used for data collection</h3>", unsafe_allow_html=True)
+# st.markdown('')
 
-image_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/deepagri/data/ville_name_id_coords.csv'
-df_map_cities = pd.read_csv(image_path)
-df_map_cities = df_map_cities.drop(['Unnamed: 0','id'], axis=1)
-df_map_cities = df_map_cities.rename(columns={'long':'lon'})
-st.map(df_map_cities,zoom=4.8)
-st.markdown('')
-st.markdown('')
+# image_path = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/deepagri/data/ville_name_id_coords.csv'
+# df_map_cities = pd.read_csv(image_path)
+# df_map_cities = df_map_cities.drop(['Unnamed: 0','id'], axis=1)
+# df_map_cities = df_map_cities.rename(columns={'long':'lon'})
+# st.map(df_map_cities,zoom=4.8)
+# st.markdown('')
+# st.markdown('')
 
 # ------------------------------------------------------------------------------
 # CREATING A CENTERED BUTTON
@@ -139,8 +139,11 @@ def show_predict():
     bar = st.progress(0)
     df_pred=pd.DataFrame(columns=[0])
 
-    gif_image = 'https://github.com/PierreCeraH/deepagri/blob/streamlit-with-page/video_parf.mp4?raw=true'
-    st.video(gif_image)
+    gif_image = 'https://github.com/PierreCeraH/deepagri/blob/master/video_parf.mp4?raw=true'
+    #st.video(gif_image)
+    st.markdown(f'''<video controls autoplay>
+                <source src={gif_image} type="video/mp4">
+                </video>''', unsafe_allow_html=True)
     # st.markdown(f'<img src={gif_image}/>', unsafe_allow_html=True)
     count = 7
     for i,s in df_2022.iterrows():
@@ -235,37 +238,37 @@ def show_predict():
     # BUILDING DF_CLUSTER FOR CHOROPLETH
     # ------------------------------------------------------------------------------
 
-    df_cluster = pd.read_csv(
-        'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/region_cluster.csv',
-        index_col=False)
-    # df_cluster = df_cluster.drop(columns='Unnamed: 0')
-    df_cluster['region'] = df_cluster['region'].astype(str).apply(lambda x: x.zfill(2))
+    # df_cluster = pd.read_csv(
+    #     'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/region_cluster.csv',
+    #     index_col=False)
+    # # df_cluster = df_cluster.drop(columns='Unnamed: 0')
+    # df_cluster['region'] = df_cluster['region'].astype(str).apply(lambda x: x.zfill(2))
 
 
 # ------------------------------------------------------------------------------
 # PLOTTING THE CHOROPLETH MAP WITH RESULTS
 # ------------------------------------------------------------------------------
 
-    st.markdown('### Departments of France, clustered by Production')
-    st.markdown('')
+    # st.markdown('### Departments of France, clustered by Production')
+    # st.markdown('')
 
-    cm = folium.Map(location=[47, 1],
-                tiles='cartodb positron',
-                min_zoom=5,
-                max_zoom=7,
-                zoom_start=5.5)
+    # cm = folium.Map(location=[47, 1],
+    #             tiles='cartodb positron',
+    #             min_zoom=5,
+    #             max_zoom=7,
+    #             zoom_start=5.5)
 
-    cm.choropleth(
-        geo_data=geojson_path,
-        data=df_cluster,
-        columns=['region', 'cluster'],
-        key_on='feature.properties.code',
-        fill_color='YlOrBr',
-        fill_opacity=0.8,
-        line_opacity=0.4,
-        legend_name=f'Production cluster')
+    # cm.choropleth(
+    #     geo_data=geojson_path,
+    #     data=df_cluster,
+    #     columns=['region', 'cluster'],
+    #     key_on='feature.properties.code',
+    #     fill_color='YlGn',
+    #     fill_opacity=0.8,
+    #     line_opacity=0.4,
+    #     legend_name=f'Production cluster')
 
-    folium_static(cm)
+    # folium_static(cm)
 
     st.markdown('')
     st.metric("French Soft Wheat 2022", f'{prediction_FRANCE} MlnT', f'{var_vs_2021} MlnT vs 2021')
@@ -294,27 +297,14 @@ if bt:
     show_predict()
 
 if "department_view" not in st.session_state:
-    details = st.button('View per Department')
-    
+    col_button_2 = st.columns(5)
+    col_name_20 = col_button[0].text('')
+    col_name_21 = col_button[1].text('')
+    details = col_button[2].button('View per Department')
+    col_name_23 = col_button[3].text('')
+    col_name_24 = col_button[4].text('')
+    #details = st.button('View per Department')
+
 if details or "department_view" in st.session_state:
     st.session_state.department_view = True
     department_pred.show_table(st.session_state.df_final)
-
-# if st.button("prediction"):
-
-#     st.write("I do the pred")
-
-#     # call the pred HERE
-
-#     st.session_state.prediction_result = pd.DataFrame(dict(a=[1, 3], b=[2, 4]))
-
-# # print the results
-# if "prediction_result" in st.session_state:
-
-#     filter = st.selectbox("select an option", ["1", "3"])
-
-#     st.session_state.prediction_result[st.session_state.prediction_result.a == int(filter)]
-
-# else:
-
-#     "pas de pred"
