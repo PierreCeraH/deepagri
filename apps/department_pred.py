@@ -40,7 +40,7 @@ def show_table(df_final):
     fig = plt.figure(figsize=(10, 4))
     plt.title(f'{option[3:]}')
     clrs = ['#ffb482' if (x == 2022) else '#4c72b0' for x in df_final.columns]
-    values = np.array(df_final.loc['00'])
+    values = np.array(df_final.loc[opt_num])
     idx = np.array(df_final.columns)
 
     sns.barplot(x=idx, y=values / 10**6, palette=clrs)

@@ -139,8 +139,9 @@ def show_predict():
     bar = st.progress(0)
     df_pred=pd.DataFrame(columns=[0])
 
-    gif_image = 'https://github.com/PierreCeraH/deepagri/blob/master/glad_wheat.gif?raw=true'
-    st.markdown(f'<img src={gif_image}/>', unsafe_allow_html=True)
+    gif_image = 'https://github.com/PierreCeraH/deepagri/blob/streamlit-with-page/video_parf.mp4?raw=true'
+    st.video(gif_image)
+    # st.markdown(f'<img src={gif_image}/>', unsafe_allow_html=True)
     count = 7
     for i,s in df_2022.iterrows():
         df_pred.loc[i]=pred(s)
