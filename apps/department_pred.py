@@ -46,7 +46,7 @@ def show_table(df_final):
     sns.barplot(x=idx, y=values / 10**6, palette=clrs)
     plt.xticks(rotation=45)
     plt.ylabel('Millions')
-    
+
     st.pyplot(fig)
 
     st.markdown("<h6 style='text-align: center; color: #708090;'>DeepAgri Project - Le Wagon - Data Science - Batch #802</h6>", unsafe_allow_html=True)
@@ -55,3 +55,14 @@ def show_table(df_final):
     col_name_1 = columns_names[1].markdown("<h7 style='text-align: center; color: #708090;'>Gaspar Dupas</h7>", unsafe_allow_html=True)
     col_name_2 = columns_names[2].markdown("<h7 style='text-align: center; color: #708090;'>Constantin Talandier</h7>", unsafe_allow_html=True)
     col_name_3 = columns_names[3].markdown("<h7 style='text-align: center; color: #708090;'>Wenfang Zhou</h7>", unsafe_allow_html=True)
+
+    taloche_pic = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/taloche_pic.jpeg'
+    wenfang_pic = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/wenfang_pic.jpeg'
+    gaspar_pic = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/gaspar_pic.jpeg'
+    pierre_pic = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/pierre_pic.jpeg'
+
+    #pictures = st.columns(4)
+    #pic_0 = pictures[0].image(pierre_pic, channels="RGB", output_format="auto")
+    #pic_1 = pictures[1].image(gaspar_pic, channels="RGB", output_format="auto")
+    #pic_2 = pictures[2].image(taloche_pic, channels="RGB", output_format="auto")
+    #pic_3 = pictures[3].image(wenfang_pic, channels="RGB", output_format="auto")

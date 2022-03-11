@@ -208,22 +208,12 @@ def show_predict():
     df_var = df_var.merge(df_final[2022], left_on='index', right_index=True, how='left')
     df_var = df_var.dropna()
 
-
-    # # Calculating yearly variations in production
-    # for i in range(2001,2022+1):
-    #    df_var[f'Var {i}-{i-1}']=round((df[i]-df[i-1])/df[i-1]*100,2)
-    # df_var = df_var.drop([i for i in range(2000,2022)], axis=1)
-
     # ------------------------------------------------------------------------------
     # YEAR TO MODIFY WITH 2022 ONCE MODEL IS READY AND RESULTS IN DF
     year = 2022
     # ------------------------------------------------------------------------------
 
     df_var = df_var[['index',year-1, year]]
-
-    # # % Variation in % CONTRIBUTION vs. last year
-    # df_var[f'Var {year}-{year-1}'] = ((df_var[year] / df_var[year].sum()*100)
-    #                                 - (df_var[year-1] / df_var[year-1].sum()*100))
 
     # % Variation in PRODUCTION vs. last year
     df_var[f'Var {year}-{year-1}'] = (df_var[year] - df_var[year-1]) / df_var[year-1]*100
