@@ -62,19 +62,20 @@ df.drop('Unnamed: 0',axis=1,inplace=True)
 # SHAPING THE STREAMLIT INTERFACE
 # ------------------------------------------------------------------------------
 
-image_url = 'https://github.com/PierreCeraH/deepagri/blob/master/photo_wheat.jpg?raw=true'
+image_url = 'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/agr_top_im.jpg'
 st.image(image_url, channels="RGB", output_format="auto")
 
 st.markdown("<h3 style='text-align: center; color: #808080;'>Forecasting French Soft Wheat Production in 2022</h3>", unsafe_allow_html=True)
+st.markdown("<h6 style='text-align: center; color: #608080;'>Machine Learning model - Forecasting before March 1st (harvest in July)</h6>", unsafe_allow_html=True)
 st.markdown('')
 st.markdown('')
 st.markdown('')
 st.markdown('')
 
 # Build columns with features
-image_meteo = 'https://github.com/PierreCeraH/deepagri/blob/1967bcc27bc69827029dd6be9016982072cf3865/meteo.jpeg?raw=True'
-image_bourse = 'https://github.com/PierreCeraH/deepagri/blob/1967bcc27bc69827029dd6be9016982072cf3865/cours_bourse.jpg?raw=True'
-image_ble = 'https://github.com/PierreCeraH/deepagri/blob/1967bcc27bc69827029dd6be9016982072cf3865/ble_recole.jpg?raw=True'
+# image_meteo = 'https://github.com/PierreCeraH/deepagri/blob/1967bcc27bc69827029dd6be9016982072cf3865/meteo.jpeg?raw=True'
+# image_bourse = 'https://github.com/PierreCeraH/deepagri/blob/1967bcc27bc69827029dd6be9016982072cf3865/cours_bourse.jpg?raw=True'
+# image_ble = 'https://github.com/PierreCeraH/deepagri/blob/1967bcc27bc69827029dd6be9016982072cf3865/ble_recole.jpg?raw=True'
 
 # st.markdown("<h3 style='text-align: center; color: #408080;'>Features</h3>", unsafe_allow_html=True)
 # st.markdown('')
@@ -271,7 +272,12 @@ def show_predict():
     # folium_static(cm)
 
     st.markdown('')
-    st.metric("French Soft Wheat 2022", f'{prediction_FRANCE} MlnT', f'{var_vs_2021} MlnT vs 2021')
+    #st.metric("French Soft Wheat 2022", f'{prediction_FRANCE} MlnT', f'{var_vs_2021} MlnT vs 2021')
+
+    col_results = st.columns(3)
+    col_results_0 = col_results[0].text('')
+    results = col_results[1].metric("French Soft Wheat 2022", f'{prediction_FRANCE} MlnT', f'{var_vs_2021} MlnT vs 2021')
+    col_results_3 = col_results[2].text('')
 
     m = folium.Map(location=[47, 1],
                 tiles='cartodb positron',
