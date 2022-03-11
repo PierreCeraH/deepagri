@@ -19,7 +19,7 @@ details = False
 # ------------------------------------------------------------------------------
 # DEF API FUNCTION
 # ------------------------------------------------------------------------------
-@st.cache
+#@st.cache
 def pred(Serie):
     url='https://deepagridocker-tdgkcolwlq-ew.a.run.app/predict'
     params={
@@ -141,8 +141,12 @@ def show_predict():
     bar = st.progress(0)
     df_pred=pd.DataFrame(columns=[0])
 
-    gif_image = 'https://github.com/PierreCeraH/deepagri/blob/streamlit-with-page/video_parf.mp4?raw=true'
-    st.video(gif_image)
+    #gif_image = 'https://github.com/PierreCeraH/deepagri/blob/streamlit-with-page/video_parf.mp4?raw=true'
+    gif_image = 'https://github.com/PierreCeraH/deepagri/blob/master/video_parf.mp4?raw=true'
+    #st.video(gif_image)
+    st.markdown(f'''<video controls autoplay width="703">
+                <source src={gif_image} type="video/mp4">
+                </video>''', unsafe_allow_html=True)
     # st.markdown(f'<img src={gif_image}/>', unsafe_allow_html=True)
     count = 7
     for i,s in df_2022.iterrows():
