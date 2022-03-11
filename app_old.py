@@ -19,7 +19,7 @@ details = False
 # ------------------------------------------------------------------------------
 # DEF API FUNCTION
 # ------------------------------------------------------------------------------
-@st.cache
+#@st.cache
 def pred(Serie):
     url='https://deepagridocker-tdgkcolwlq-ew.a.run.app/predict'
     params={
@@ -71,7 +71,8 @@ st.markdown('')
 st.markdown('')
 st.markdown('')
 st.markdown('')
-# # Build columns with features
+
+# Build columns with features
 # image_meteo = 'https://github.com/PierreCeraH/deepagri/blob/1967bcc27bc69827029dd6be9016982072cf3865/meteo.jpeg?raw=True'
 # image_bourse = 'https://github.com/PierreCeraH/deepagri/blob/1967bcc27bc69827029dd6be9016982072cf3865/cours_bourse.jpg?raw=True'
 # image_ble = 'https://github.com/PierreCeraH/deepagri/blob/1967bcc27bc69827029dd6be9016982072cf3865/ble_recole.jpg?raw=True'
@@ -87,9 +88,9 @@ st.markdown('')
 # col_feat_2 = col_features[2].markdown("<h6 style='text-align: center; color: #308080;'>Historical Prices</h6>", unsafe_allow_html=True)
 # col_feat_2 = col_features[2].image(image_bourse)
 
-# # ------------------------------------------------------------------------------
-# # BUILDING THE MAP WITH CITIES
-# # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# BUILDING THE MAP WITH CITIES
+# ------------------------------------------------------------------------------
 # st.markdown('')
 # st.markdown('')
 # st.markdown("<h3 style='text-align: center; color: #408080;'>Cities used for data collection</h3>", unsafe_allow_html=True)
@@ -106,14 +107,12 @@ st.markdown('')
 # ------------------------------------------------------------------------------
 # CREATING A CENTERED BUTTON
 # ------------------------------------------------------------------------------
-col11, col21, col31 = st.columns(3)
-bt = col21.button('Prediction for 2022')
-# col_button = st.columns(3)
-# col_name_0 = col_button[0].text('')
-# col_name_1 = col_button[1].text('')
-# bt = col_button[2].button('Prediction 2022')
-# col_name_3 = col_button[3].text('')
-# col_name_4 = col_button[4].text('')
+col_button = st.columns(5)
+col_name_0 = col_button[0].text('')
+col_name_1 = col_button[1].text('')
+bt = col_button[2].button('Predict 2022')
+col_name_3 = col_button[3].text('')
+col_name_4 = col_button[4].text('')
 
 # ------------------------------------------------------------------------------
 #GETTING RESULTS FROM THE API & SHOWING MAP
@@ -141,8 +140,11 @@ def show_predict():
     bar = st.progress(0)
     df_pred=pd.DataFrame(columns=[0])
 
-    gif_image = 'https://github.com/PierreCeraH/deepagri/blob/streamlit-with-page/video_parf.mp4?raw=true'
-    st.video(gif_image)
+    gif_image = 'https://github.com/PierreCeraH/deepagri/blob/master/video_parf.mp4?raw=true'
+    #st.video(gif_image)
+    st.markdown(f'''<video controls autoplay>
+                <source src={gif_image} type="video/mp4">
+                </video>''', unsafe_allow_html=True)
     # st.markdown(f'<img src={gif_image}/>', unsafe_allow_html=True)
     count = 7
     for i,s in df_2022.iterrows():
@@ -206,22 +208,12 @@ def show_predict():
     df_var = df_var.merge(df_final[2022], left_on='index', right_index=True, how='left')
     df_var = df_var.dropna()
 
-
-    # # Calculating yearly variations in production
-    # for i in range(2001,2022+1):
-    #    df_var[f'Var {i}-{i-1}']=round((df[i]-df[i-1])/df[i-1]*100,2)
-    # df_var = df_var.drop([i for i in range(2000,2022)], axis=1)
-
     # ------------------------------------------------------------------------------
     # YEAR TO MODIFY WITH 2022 ONCE MODEL IS READY AND RESULTS IN DF
     year = 2022
     # ------------------------------------------------------------------------------
 
     df_var = df_var[['index',year-1, year]]
-
-    # # % Variation in % CONTRIBUTION vs. last year
-    # df_var[f'Var {year}-{year-1}'] = ((df_var[year] / df_var[year].sum()*100)
-    #                                 - (df_var[year-1] / df_var[year-1].sum()*100))
 
     # % Variation in PRODUCTION vs. last year
     df_var[f'Var {year}-{year-1}'] = (df_var[year] - df_var[year-1]) / df_var[year-1]*100
@@ -237,11 +229,11 @@ def show_predict():
     # BUILDING DF_CLUSTER FOR CHOROPLETH
     # ------------------------------------------------------------------------------
 
-    df_cluster = pd.read_csv(
-        'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/region_cluster.csv',
-        index_col=False)
-    # df_cluster = df_cluster.drop(columns='Unnamed: 0')
-    df_cluster['region'] = df_cluster['region'].astype(str).apply(lambda x: x.zfill(2))
+    # df_cluster = pd.read_csv(
+    #     'https://raw.githubusercontent.com/PierreCeraH/deepagri/master/region_cluster.csv',
+    #     index_col=False)
+    # # df_cluster = df_cluster.drop(columns='Unnamed: 0')
+    # df_cluster['region'] = df_cluster['region'].astype(str).apply(lambda x: x.zfill(2))
 
 
 # ------------------------------------------------------------------------------
@@ -262,7 +254,7 @@ def show_predict():
     #     data=df_cluster,
     #     columns=['region', 'cluster'],
     #     key_on='feature.properties.code',
-    #     fill_color='YlOrBr',
+    #     fill_color='YlGn',
     #     fill_opacity=0.8,
     #     line_opacity=0.4,
     #     legend_name=f'Production cluster')
@@ -270,7 +262,7 @@ def show_predict():
     # folium_static(cm)
 
     st.markdown('')
-    # st.metric("French Soft Wheat 2022", f'{prediction_FRANCE} MlnT', f'{var_vs_2021} MlnT vs 2021')
+    #st.metric("French Soft Wheat 2022", f'{prediction_FRANCE} MlnT', f'{var_vs_2021} MlnT vs 2021')
 
     col_results = st.columns(3)
     col_results_0 = col_results[0].text('')
@@ -301,28 +293,14 @@ if bt:
     show_predict()
 
 if "department_view" not in st.session_state:
-    col1, col2, col3 = st.columns(3)
-    details = col2.button('View Departments')
+    col_button_2 = st.columns(5)
+    col_name_20 = col_button[0].text('')
+    col_name_21 = col_button[1].text('')
+    details = col_button[2].button('View per Department')
+    col_name_23 = col_button[3].text('')
+    col_name_24 = col_button[4].text('')
+    #details = st.button('View per Department')
 
 if details or "department_view" in st.session_state:
     st.session_state.department_view = True
     department_pred.show_table(st.session_state.df_final)
-
-# if st.button("prediction"):
-
-#     st.write("I do the pred")
-
-#     # call the pred HERE
-
-#     st.session_state.prediction_result = pd.DataFrame(dict(a=[1, 3], b=[2, 4]))
-
-# # print the results
-# if "prediction_result" in st.session_state:
-
-#     filter = st.selectbox("select an option", ["1", "3"])
-
-#     st.session_state.prediction_result[st.session_state.prediction_result.a == int(filter)]
-
-# else:
-
-#     "pas de pred"
